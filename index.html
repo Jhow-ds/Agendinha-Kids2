@@ -539,7 +539,7 @@
                         </button>
                     </div>
                 </div>
-                <div id="listaAlunos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6"></div>
+                <div id="listaAlunos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6"></div>
             </div>
         </div>
 
@@ -711,17 +711,21 @@
                     
                     <!-- Aplicar Recompensas -->
                     <div class="bg-gray-50 p-4 lg:p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold mb-4">💰 Aplicar Recompensas</h3>
+                        <h3 class="text-lg font-semibold mb-4">💰 Aplicar/Retirar em Massa</h3>
                         <div class="space-y-4">
                             <select id="turmaRecompensa" class="w-full px-3 py-2 text-sm border rounded-lg">
                                 <option value="">Selecionar Turma</option>
                             </select>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <input type="number" id="valorMoedas" placeholder="Moedas" class="w-full px-3 py-2 text-sm border rounded-lg">
-                                <input type="number" id="valorEstrelas" placeholder="Estrelas" class="w-full px-3 py-2 text-sm border rounded-lg">
+                                <input type="number" id="valorSaude" placeholder="Saúde" class="w-full px-3 py-2 text-sm border rounded-lg">
+                                <input type="number" id="valorFelicidade" placeholder="Felicidade" class="w-full px-3 py-2 text-sm border rounded-lg">
                             </div>
-                            <button onclick="aplicarRecompensas()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 text-sm rounded-lg transition-colors">
-                                ⚡ Aplicar aos Presentes
+                            <button onclick="aplicarEmMassa()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                                <i class="fas fa-plus-circle"></i> Aplicar aos Presentes
+                            </button>
+                            <button onclick="retirarEmMassa()" class="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                                <i class="fas fa-minus-circle"></i> Retirar dos Presentes
                             </button>
                         </div>
                     </div>
@@ -1297,64 +1301,66 @@
             }
             
             return `
-            <div class="student-card ${cardBgClass} rounded-xl shadow-lg border-2 ${cardBorderClass} p-4 sm:p-6 relative overflow-hidden group hover:shadow-xl transition-all duration-300 ${isAniversariante ? 'ring-2 ring-yellow-300 ring-opacity-50' : ''}">
+            <div class="student-card ${cardBgClass} rounded-xl shadow-lg border-2 ${cardBorderClass} p-4 sm:p-6 relative overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col justify-between ${isAniversariante ? 'ring-2 ring-yellow-300 ring-opacity-50' : ''}">
                 ${isAniversariante ? '<div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-yellow-400 to-amber-500 rounded-bl-full flex items-start justify-end p-2"><span class="text-white text-xs">🎂</span></div>' : ''}
                 
-                <div class="flex items-start justify-between mb-4">
-                    <div class="flex items-center space-x-4 min-w-0">
-                        <div class="relative flex-shrink-0">
-                            <div class="w-20 h-20 rounded-2xl overflow-hidden border-3 ${isAniversariante ? 'border-yellow-400' : 'border-slate-200'} shadow-lg bg-gradient-to-br from-slate-100 to-slate-200">
-                                <img src="${aluno.avatar || gerarAvatarPorNome(aluno.nome)}" 
-                                     alt="Avatar de ${aluno.nome}" 
-                                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik00MCA0MEMzNS41ODE3IDQwIDMyIDM2LjQxODMgMzIgMzJDMzIgMjcuNTgxNyAzNS41ODE3IDI0IDQwIDI0QzQ0LjQxODMgMjQgNDggMjcuNTgxNyA0OCAzMkM0OCAzNi41ODE3IDQ0LjQxODMgNDAgNDAgNDBaTTQwIDQ0QzMwLjA1ODkgNDQgMjIgNTEuMTYzNCAyMiA2MEgyMkMyMiA2MC41NTIzIDIyLjQ0NzcgNjEgMjMgNjFINTdDNTcuNTUyMyA2MSA1OCA2MC41NTIzIDU4IDYwQzU4IDUxLjE2MzQgNDkuOTQxMSA0NCA0MCA0NFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+'; this.alt='Avatar padrão';">
+                <div> <!-- Container for top part -->
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center space-x-4 min-w-0">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-20 h-20 rounded-2xl overflow-hidden border-3 ${isAniversariante ? 'border-yellow-400' : 'border-slate-200'} shadow-lg bg-gradient-to-br from-slate-100 to-slate-200">
+                                    <img src="${aluno.avatar || gerarAvatarPorNome(aluno.nome)}" 
+                                        alt="Avatar de ${aluno.nome}" 
+                                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik00MCA0MEMzNS41ODE3IDQwIDMyIDM2LjQxODMgMzIgMzJDMzIgMjcuNTgxNyAzNS41ODE3IDI0IDQwIDI0QzQ0LjQxODMgMjQgNDggMjcuNTgxNyA0OCAzMkM0OCAzNi41ODE3IDQ0LjQxODMgNDAgNDAgNDBaTTQwIDQ0QzMwLjA1ODkgNDQgMjIgNTEuMTYzNCAyMiA2MEgyMkMyMiA2MC41NTIzIDIyLjQ0NzcgNjEgMjMgNjFINTdDNTcuNTUyMyA2MSA1OCA2MC41NTIzIDU4IDYwQzU4IDUxLjE2MzQgNDkuOTQxMSA0NCA0MCA0NFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+'; this.alt='Avatar padrão';">
+                                </div>
+                                <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full ${aluno.presente ? 'bg-emerald-500' : 'bg-slate-400'} border-2 border-white shadow-sm flex items-center justify-center">
+                                    <i class="fas ${aluno.presente ? 'fa-check' : 'fa-times'} text-white text-xs"></i>
+                                </div>
                             </div>
-                            <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full ${aluno.presente ? 'bg-emerald-500' : 'bg-slate-400'} border-2 border-white shadow-sm flex items-center justify-center">
-                                <i class="fas ${aluno.presente ? 'fa-check' : 'fa-times'} text-white text-xs"></i>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-1 leading-snug whitespace-normal" title="${aluno.nome}">${nomeFormatado}</h3>
+                                <div class="flex items-center space-x-3 text-xs sm:text-sm">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                                        ${aluno.turma}
+                                    </span>
+                                    ${dataAniversario ? `<span class="text-slate-500 hidden sm:inline">📅 ${dataAniversario}</span>` : ''}
+                                </div>
                             </div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-1 leading-tight truncate" title="${aluno.nome}">${nomeFormatado}</h3>
-                            <div class="flex items-center space-x-3 text-xs sm:text-sm">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
-                                    ${aluno.turma}
-                                </span>
-                                ${dataAniversario ? `<span class="text-slate-500 hidden sm:inline">📅 ${dataAniversario}</span>` : ''}
-                            </div>
+                        
+                        <div class="flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 ml-2">
+                            <button onclick="regenerarAvatar('${aluno.id}')" class="p-2 text-purple-500 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-colors" title="Regenerar Avatar">
+                                <i class="fas fa-sync-alt text-sm"></i>
+                            </button>
+                            <button onclick="editarAluno('${aluno.id}')" class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors" title="Editar Aluno">
+                                <i class="fas fa-edit text-sm"></i>
+                            </button>
+                            <button onclick="deletarAluno('${aluno.id}')" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" title="Deletar Aluno">
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
                         </div>
                     </div>
-                    
-                    <div class="flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 ml-2">
-                        <button onclick="regenerarAvatar('${aluno.id}')" class="p-2 text-purple-500 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-colors" title="Regenerar Avatar">
-                            <i class="fas fa-sync-alt text-sm"></i>
-                        </button>
-                        <button onclick="editarAluno('${aluno.id}')" class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors" title="Editar Aluno">
-                            <i class="fas fa-edit text-sm"></i>
-                        </button>
-                        <button onclick="deletarAluno('${aluno.id}')" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" title="Deletar Aluno">
-                            <i class="fas fa-trash text-sm"></i>
-                        </button>
+
+                    <div class="flex items-center justify-between mb-4 bg-slate-50 rounded-lg p-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg">💰</span>
+                            <span class="text-lg font-bold text-amber-600">${aluno.moedas || 0}</span>
+                        </div>
+                        <div class="flex items-center space-x-3 text-sm">
+                            <div class="flex items-center space-x-1">
+                                <span class="text-red-500">❤️</span>
+                                <span class="font-bold text-slate-800">${aluno.saude || 100}</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <span class="text-green-500">😊</span>
+                                <span class="font-bold text-slate-800">${aluno.felicidade || 100}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between mb-4 bg-slate-50 rounded-lg p-3">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-lg">💰</span>
-                        <span class="text-lg font-bold text-amber-600">${aluno.moedas || 0}</span>
-                    </div>
-                    <div class="flex items-center space-x-3 text-sm">
-                        <div class="flex items-center space-x-1">
-                            <span class="text-red-500">❤️</span>
-                            <span class="font-bold text-slate-800">${aluno.saude || 100}</span>
-                        </div>
-                        <div class="flex items-center space-x-1">
-                            <span class="text-green-500">😊</span>
-                            <span class="font-bold text-slate-800">${aluno.felicidade || 100}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
+                <div> <!-- Container for bottom part -->
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-sm font-medium text-slate-600">Frequência</span>
                         <span class="text-sm font-bold ${getFrequenciaColor(frequencia)}">${frequencia}%</span>
@@ -2394,7 +2400,7 @@
             `;
         }
 
-        // Funções de Ferramentas (sem alterações)
+        // Funções de Ferramentas
         function sortearIndividual() {
             const turma = document.getElementById('turmaSorteio').value;
             if (!turma) {
@@ -2716,19 +2722,20 @@
             nomesSorteadosDiv.innerHTML = nomesSorteadosArray.join(', ');
             listaSorteadosDiv.classList.remove('hidden');
         }
-
-        function aplicarRecompensas() {
+        
+        function aplicarEmMassa() {
             const turma = document.getElementById('turmaRecompensa').value;
             const moedas = parseInt(document.getElementById('valorMoedas').value) || 0;
-            const estrelas = parseInt(document.getElementById('valorEstrelas').value) || 0;
+            const saude = parseInt(document.getElementById('valorSaude').value) || 0;
+            const felicidade = parseInt(document.getElementById('valorFelicidade').value) || 0;
 
             if (!turma) {
                 showNotification('Selecione uma turma primeiro!', 'warning');
                 return;
             }
 
-            if (moedas === 0 && estrelas === 0) {
-                showNotification('Digite um valor para moedas ou estrelas!', 'warning');
+            if (moedas === 0 && saude === 0 && felicidade === 0) {
+                showNotification('Digite um valor para moedas, saúde ou felicidade!', 'warning');
                 return;
             }
 
@@ -2738,7 +2745,8 @@
             alunos.forEach(aluno => {
                 if (aluno.turma === turma && aluno.presente) {
                     aluno.moedas = (aluno.moedas || 0) + moedas;
-                    aluno.estrelas = (aluno.estrelas || 0) + estrelas;
+                    aluno.saude = Math.min(100, (aluno.saude || 100) + saude);
+                    aluno.felicidade = Math.min(100, (aluno.felicidade || 100) + felicidade);
                     alunosAfetados++;
                 }
             });
@@ -2746,10 +2754,49 @@
             localStorage.setItem('alunos', JSON.stringify(alunos));
             showNotification(`Recompensas aplicadas para ${alunosAfetados} alunos presentes!`, 'success');
             
-            // Limpar campos
             document.getElementById('valorMoedas').value = '';
-            document.getElementById('valorEstrelas').value = '';
+            document.getElementById('valorSaude').value = '';
+            document.getElementById('valorFelicidade').value = '';
+            if(currentSection === 'alunos') filtrarAlunos();
         }
+
+        function retirarEmMassa() {
+            const turma = document.getElementById('turmaRecompensa').value;
+            const moedas = parseInt(document.getElementById('valorMoedas').value) || 0;
+            const saude = parseInt(document.getElementById('valorSaude').value) || 0;
+            const felicidade = parseInt(document.getElementById('valorFelicidade').value) || 0;
+
+            if (!turma) {
+                showNotification('Selecione uma turma primeiro!', 'warning');
+                return;
+            }
+
+            if (moedas === 0 && saude === 0 && felicidade === 0) {
+                showNotification('Digite um valor para moedas, saúde ou felicidade!', 'warning');
+                return;
+            }
+
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            let alunosAfetados = 0;
+
+            alunos.forEach(aluno => {
+                if (aluno.turma === turma && aluno.presente) {
+                    aluno.moedas = Math.max(0, (aluno.moedas || 0) - moedas);
+                    aluno.saude = Math.max(0, (aluno.saude || 100) - saude);
+                    aluno.felicidade = Math.max(0, (aluno.felicidade || 100) - felicidade);
+                    alunosAfetados++;
+                }
+            });
+
+            localStorage.setItem('alunos', JSON.stringify(alunos));
+            showNotification(`Valores retirados de ${alunosAfetados} alunos presentes!`, 'info');
+            
+            document.getElementById('valorMoedas').value = '';
+            document.getElementById('valorSaude').value = '';
+            document.getElementById('valorFelicidade').value = '';
+            if(currentSection === 'alunos') filtrarAlunos();
+        }
+
 
         function criarConfetes() {
             const cores = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8'];
