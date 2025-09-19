@@ -1,0 +1,2866 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Mobile-first approach */
+        .sidebar-item:hover { background-color: #475569; transform: translateX(4px); }
+        .sidebar-item { transition: all 0.2s ease; }
+        
+        .modal { display: none; }
+        .modal.active { display: flex; }
+        
+        .student-card { transition: all 0.3s ease; }
+        .student-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        
+        /* Animation Overlay */
+        #mesOverlay {
+            transition: background-color 0.5s ease-in-out;
+        }
+        
+        /* Mobile Menu System */
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #1e293b;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .hamburger-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+        
+        .hamburger-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .hamburger-icon {
+            width: 24px;
+            height: 18px;
+            position: relative;
+            transform: rotate(0deg);
+            transition: 0.3s ease-in-out;
+        }
+        
+        .hamburger-icon span {
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background: white;
+            border-radius: 3px;
+            opacity: 1;
+            left: 0;
+            transform: rotate(0deg);
+            transition: 0.25s ease-in-out;
+        }
+        
+        .hamburger-icon span:nth-child(1) { top: 0px; }
+        .hamburger-icon span:nth-child(2) { top: 7px; }
+        .hamburger-icon span:nth-child(3) { top: 14px; }
+        
+        .hamburger-btn.active .hamburger-icon span:nth-child(1) {
+            top: 7px;
+            transform: rotate(135deg);
+        }
+        
+        .hamburger-btn.active .hamburger-icon span:nth-child(2) {
+            opacity: 0;
+            left: -60px;
+        }
+        
+        .hamburger-btn.active .hamburger-icon span:nth-child(3) {
+            top: 7px;
+            transform: rotate(-135deg);
+        }
+        
+        .mobile-title {
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        /* Mobile Sidebar */
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: #1e293b;
+            z-index: 1100;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+        
+        .mobile-sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .mobile-sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #334155;
+            background: #0f172a;
+        }
+        
+        .mobile-sidebar-title {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .mobile-sidebar-nav {
+            padding: 1rem 0;
+        }
+        
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+        
+        .mobile-nav-item:hover {
+            background: #334155;
+            color: white;
+            transform: translateX(4px);
+        }
+        
+        .mobile-nav-item.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .mobile-nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Mobile Overlay */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Desktop Sidebar System */
+        .desktop-sidebar-trigger {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 100vh;
+            z-index: 60;
+            background: transparent;
+        }
+        
+        .desktop-sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 16rem;
+            background: #1e293b;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 40;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .desktop-sidebar.show {
+            transform: translateX(0);
+        }
+        
+        /* Content adjustments */
+        .main-content {
+            padding-top: 60px; /* Space for mobile header */
+        }
+        
+        /* Responsive notifications */
+        .notification { 
+            position: fixed; 
+            top: 70px; /* Below mobile header */
+            right: 1rem; 
+            left: 1rem;
+            z-index: 1000; 
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show { 
+            transform: translateY(0); 
+        }
+        
+        /* Modal responsive styles */
+        .modal-content {
+            width: 95%;
+            max-width: 28rem;
+            max-height: 90vh;
+            margin: auto;
+            overflow-y: auto;
+        }
+        
+        /* Desktop styles */
+        @media (min-width: 1024px) {
+            .mobile-header {
+                display: none;
+            }
+            
+            .main-content {
+                padding-top: 0;
+                transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            .mobile-sidebar {
+                display: none;
+            }
+            
+            .mobile-overlay {
+                display: none;
+            }
+            
+            .notification {
+                top: 1.25rem;
+                left: auto;
+                right: 1.25rem;
+                min-width: 300px;
+                transform: translateX(400px);
+            }
+            
+            .notification.show {
+                transform: translateX(0);
+            }
+        }
+        
+        /* Tablet adjustments */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .modal-content {
+                width: 80%;
+                max-width: 32rem;
+            }
+            
+            .mobile-sidebar {
+                width: 320px;
+            }
+        }
+        
+        /* Small mobile adjustments */
+        @media (max-width: 480px) {
+            .modal-content {
+                width: 98%;
+                margin: 0.5rem auto;
+                max-height: 95vh;
+            }
+            
+            .mobile-sidebar {
+                width: 260px;
+            }
+            
+            .mobile-title {
+                font-size: 1rem;
+            }
+        }
+
+        /* Animações personalizadas */
+        @keyframes confeteFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% {
+                transform: translate3d(0,0,0);
+            }
+            40%, 43% {
+                transform: translate3d(0, -30px, 0);
+            }
+            70% {
+                transform: translate3d(0, -15px, 0);
+            }
+            90% {
+                transform: translate3d(0, -4px, 0);
+            }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .animate-slideInUp {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .animate-bounce {
+            animation: bounce 1s infinite;
+        }
+
+        /* Estilos para cards da loja */
+        .line-clamp-1 {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Hover effect para cards da loja */
+        .bg-white:hover .group-hover\:opacity-100 {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans">
+    <!-- Mobile Header -->
+    <header class="mobile-header lg:hidden">
+        <button id="mobileMenuBtn" class="hamburger-btn">
+            <div class="hamburger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+        <h1 class="mobile-title">🎮 Gestão Maker</h1>
+        <div></div> <!-- Spacer for centering -->
+    </header>
+
+    <!-- Mobile Sidebar -->
+    <nav id="mobileSidebar" class="mobile-sidebar lg:hidden">
+        <div class="mobile-sidebar-header">
+            <div class="mobile-sidebar-title">
+                🎮 Gestão Maker
+            </div>
+        </div>
+        <div class="mobile-sidebar-nav">
+            <button class="mobile-nav-item" onclick="showSection('alunos')">
+                <i class="fas fa-users"></i>
+                <span>Alunos</span>
+            </button>
+            <button class="mobile-nav-item" onclick="showSection('chamada')">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Chamada</span>
+            </button>
+            <button class="mobile-nav-item" onclick="showSection('missoes')">
+                <i class="fas fa-trophy"></i>
+                <span>Missões</span>
+            </button>
+            <button class="mobile-nav-item" onclick="showSection('relatorios')">
+                <i class="fas fa-chart-bar"></i>
+                <span>Relatórios</span>
+            </button>
+            <button class="mobile-nav-item" onclick="showSection('loja')">
+                <i class="fas fa-store"></i>
+                <span>Loja</span>
+            </button>
+            <button class="mobile-nav-item" onclick="showSection('ferramentas')">
+                <i class="fas fa-tools"></i>
+                <span>Ferramentas</span>
+            </button>
+            <button class="mobile-nav-item" onclick="showSection('cadastroMassa')">
+                <i class="fas fa-users-cog"></i>
+                <span>Cadastro em Massa</span>
+            </button>
+            <button class="mobile-nav-item" onclick="importData()">
+                <i class="fas fa-file-import"></i>
+                <span>Importar Dados</span>
+            </button>
+            <button class="mobile-nav-item" onclick="exportData()">
+                <i class="fas fa-file-export"></i>
+                <span>Exportar Dados</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" class="mobile-overlay lg:hidden"></div>
+
+    <!-- Desktop Sidebar Trigger Zone -->
+    <div id="desktopSidebarTrigger" class="desktop-sidebar-trigger hidden lg:block"></div>
+
+    <!-- Desktop Sidebar -->
+    <div id="desktopSidebar" class="desktop-sidebar hidden lg:block">
+        <div class="p-6 border-b border-slate-700">
+            <h1 class="text-xl font-bold">🎮 Gestão Maker</h1>
+        </div>
+        <nav class="mt-6">
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="showSection('alunos')">
+                <i class="fas fa-users"></i><span>Alunos</span>
+            </div>
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="showSection('chamada')">
+                <i class="fas fa-clipboard-check"></i><span>Chamada</span>
+            </div>
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="showSection('missoes')">
+                <i class="fas fa-trophy"></i><span>Missões</span>
+            </div>
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="showSection('relatorios')">
+                <i class="fas fa-chart-bar"></i><span>Relatórios</span>
+            </div>
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="showSection('loja')">
+                <i class="fas fa-store"></i><span>Loja</span>
+            </div>
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="showSection('ferramentas')">
+                <i class="fas fa-tools"></i><span>Ferramentas</span>
+            </div>
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="showSection('cadastroMassa')">
+                <i class="fas fa-users-cog"></i><span>Cadastro em Massa</span>
+            </div>
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="importData()">
+                <i class="fas fa-file-import"></i><span>Importar Dados</span>
+            </div>
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="exportData()">
+                <i class="fas fa-file-export"></i><span>Exportar Dados</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <!-- "Passando o Mês" Animation Overlay -->
+    <div id="mesOverlay" class="fixed inset-0 bg-black bg-opacity-0 flex-col items-center justify-center z-[1500] hidden pointer-events-none">
+        <div id="mesSpinner" class="animate-spin w-16 h-16 border-4 border-white border-t-transparent rounded-full mb-4"></div>
+        <p id="mesTexto" class="text-white text-2xl font-bold">Passando o mês...</p>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="main-content min-h-screen p-4 lg:p-0">
+        <!-- Alunos Section -->
+        <div id="alunos" class="section p-2 sm:p-4 lg:p-8">
+            <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-6 mb-4 lg:mb-6">
+                <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 mb-4 lg:mb-6">
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800">👥 Gerenciar Alunos</h2>
+                    <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 lg:space-x-4">
+                        <select id="filtroTurma" class="px-3 py-2 text-sm border rounded-lg" onchange="filtrarAlunos()">
+                            <option value="">Todas as Turmas</option>
+                        </select>
+                        <input type="text" id="pesquisarAluno" placeholder="Pesquisar aluno..." class="px-3 py-2 text-sm border rounded-lg" oninput="filtrarAlunos()">
+                        <button onclick="openModal('modalProximoMes')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                            <i class="fas fa-calendar-alt"></i> <span class="hidden sm:inline">Próximo Mês</span>
+                        </button>
+                        <button onclick="openModal('modalCadastroAluno')" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                            <i class="fas fa-plus"></i> <span class="hidden sm:inline">Novo Aluno</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="listaAlunos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6"></div>
+            </div>
+        </div>
+
+        <!-- Chamada Section -->
+        <div id="chamada" class="section p-2 sm:p-4 lg:p-8 hidden">
+            <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-6">
+                <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 mb-4 lg:mb-6">
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800">📋 Chamada</h2>
+                    <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 lg:space-x-4">
+                        <select id="turmaChamada" class="px-3 py-2 text-sm border rounded-lg">
+                            <option value="">Selecionar Turma</option>
+                        </select>
+                        <button onclick="novaChamada()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                            <i class="fas fa-plus"></i> <span class="hidden sm:inline">Nova Chamada</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="chamadaContent"></div>
+                <div id="historicoChamadas" class="mt-4 lg:mt-8"></div>
+            </div>
+        </div>
+
+        <!-- Missões Section -->
+        <div id="missoes" class="section p-8 hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">🏆 Missões</h2>
+                    <button onclick="openModal('modalMissao')" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-plus"></i> Nova Missão
+                    </button>
+                </div>
+                <div id="listaMissoes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+        </div>
+
+        <!-- Relatórios Section -->
+        <div id="relatorios" class="section p-8 hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📊 Relatórios</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="relatoriosContent"></div>
+            </div>
+        </div>
+
+        <!-- Loja Section -->
+        <div id="loja" class="section p-8 hidden">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
+                    <h2 class="text-2xl font-bold text-gray-800">🛒 Loja</h2>
+                    <div class="flex flex-wrap gap-2">
+                        <input type="text" id="pesquisarProduto" placeholder="Pesquisar item..." class="px-3 py-2 text-sm border rounded-lg" oninput="filtrarProdutos()">
+                        <button onclick="toggleHistoricoCompras()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0">
+                            <i class="fas fa-history"></i> Histórico
+                        </button>
+                        <button onclick="openModal('modalProduto')" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0">
+                            <i class="fas fa-plus"></i> Novo Item
+                        </button>
+                        <button onclick="exportarLoja()" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                        <button onclick="importarLoja()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0">
+                            <i class="fas fa-upload"></i> Importar
+                        </button>
+                    </div>
+                </div>
+                <div id="listaProdutos" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+            </div>
+            
+            <!-- Histórico de Compras -->
+            <div id="historicoCompras" class="bg-white rounded-lg shadow-md p-6 hidden">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">📋 Histórico de Compras</h3>
+                <div id="listaCompras"></div>
+            </div>
+        </div>
+
+        <!-- Cadastro em Massa Section -->
+        <div id="cadastroMassa" class="section p-8 hidden">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">👥 Cadastro de Alunos em Massa</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Selecionar Turma:</label>
+                        <select id="turmaCadastroMassa" class="w-full px-4 py-2 border rounded-lg mb-4">
+                            <option value="">Selecionar Turma</option>
+                        </select>
+                        
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nomes dos Alunos (um por linha):</label>
+                        <textarea id="nomesAlunos" placeholder="João Silva&#10;Maria Santos&#10;Pedro Oliveira&#10;Ana Costa" 
+                                  class="w-full h-64 px-4 py-2 border rounded-lg resize-none"></textarea>
+                        
+                        <div class="mt-4">
+                            <button onclick="cadastrarAlunosEmMassa()" class="w-full bg-slate-700 hover:bg-slate-800 text-white px-6 py-3 rounded-lg transition-colors">
+                                <i class="fas fa-users"></i> Cadastrar Alunos
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4">📋 Instruções:</h3>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li>• Digite um nome por linha</li>
+                            <li>• Selecione a turma antes de cadastrar</li>
+                            <li>• Os alunos serão criados com valores padrão (0 moedas, 0 estrelas)</li>
+                            <li>• Avatares serão atribuídos automaticamente</li>
+                            <li>• Use o botão "Exportar Dados" na barra lateral para backup completo</li>
+                        </ul>
+                        
+                        <div id="resultadoCadastro" class="mt-4 p-4 bg-white rounded border hidden">
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Resultado do Cadastro:</h4>
+                            <div id="detalhesResultado"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ferramentas Section -->
+        <div id="ferramentas" class="section p-2 sm:p-4 lg:p-8 hidden">
+            <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-6">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4 lg:mb-6">🔧 Ferramentas</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                    <!-- Sorteio de Alunos -->
+                    <div class="bg-gray-50 p-4 lg:p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4">🎲 Sorteio de Alunos</h3>
+                        <div class="space-y-4">
+                            <select id="turmaSorteio" class="w-full px-3 py-2 text-sm border rounded-lg">
+                                <option value="">Selecionar Turma</option>
+                            </select>
+                            
+                            <!-- Configurações do Sorteio -->
+                            <div class="bg-white p-3 rounded border">
+                                <h4 class="text-sm font-medium mb-3">⚙️ Configurações</h4>
+                                <div class="space-y-3">
+                                    <label class="flex items-center space-x-2 text-sm">
+                                        <input type="checkbox" id="eliminarSorteados" checked class="rounded">
+                                        <span>Eliminar nomes já sorteados</span>
+                                    </label>
+                                    <div class="flex items-center space-x-2">
+                                        <label class="text-sm font-medium">Número de equipes:</label>
+                                        <input type="number" id="numeroEquipes" value="2" min="2" max="10" class="w-16 px-2 py-1 text-sm border rounded">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Botões de Sorteio -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <button onclick="sortearIndividual()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                                    🎯 Individual
+                                </button>
+                                <button onclick="sortearEquipe()" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                                    👥 Equipes
+                                </button>
+                            </div>
+                            
+                            <!-- Botão Reset -->
+                            <button onclick="resetarSorteios()" class="w-full bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                                🔄 Resetar Sorteios
+                            </button>
+                            
+                            <!-- Lista de Sorteados -->
+                            <div id="listaSorteados" class="hidden bg-white p-3 rounded border">
+                                <h4 class="text-sm font-medium mb-2">📋 Já Sorteados:</h4>
+                                <div id="nomesSorteados" class="text-xs text-gray-600"></div>
+                            </div>
+                            
+                            <!-- Resultado do Sorteio -->
+                            <div id="resultadoSorteio" class="bg-white rounded border min-h-[60px] flex items-center justify-center text-gray-500 text-sm"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Aplicar Recompensas -->
+                    <div class="bg-gray-50 p-4 lg:p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4">💰 Aplicar Recompensas</h3>
+                        <div class="space-y-4">
+                            <select id="turmaRecompensa" class="w-full px-3 py-2 text-sm border rounded-lg">
+                                <option value="">Selecionar Turma</option>
+                            </select>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <input type="number" id="valorMoedas" placeholder="Moedas" class="w-full px-3 py-2 text-sm border rounded-lg">
+                                <input type="number" id="valorEstrelas" placeholder="Estrelas" class="w-full px-3 py-2 text-sm border rounded-lg">
+                            </div>
+                            <button onclick="aplicarRecompensas()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                                ⚡ Aplicar aos Presentes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Frase do Dia -->
+                <div class="mt-4 lg:mt-6 bg-gray-50 p-4 lg:p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-4">💭 Frase do Dia</h3>
+                    <div id="fraseDia" class="text-center italic text-gray-700 p-3 lg:p-4 bg-white rounded border text-sm lg:text-base"></div>
+                    <button onclick="buscarFrase()" class="mt-3 lg:mt-4 w-full sm:w-auto bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 text-sm rounded-lg transition-colors">
+                        ✨ Nova Frase
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cadastro Aluno -->
+    <div id="modalCadastroAluno" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
+        <div class="modal-content bg-white rounded-lg p-4 sm:p-6">
+            <h3 class="text-lg font-semibold mb-4">Cadastrar Novo Aluno</h3>
+            <div class="space-y-4">
+                <input type="text" id="nomeAluno" placeholder="Nome do aluno" class="w-full px-4 py-2 border rounded-lg">
+                <select id="turmaAluno" class="w-full px-4 py-2 border rounded-lg">
+                    <option value="">Selecionar Turma</option>
+                </select>
+                <input type="date" id="aniversarioAluno" class="w-full px-4 py-2 border rounded-lg">
+                <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                    <button onclick="salvarAluno()" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Salvar</button>
+                    <button onclick="closeModal('modalCadastroAluno')" class="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Aluno -->
+    <div id="modalEditarAluno" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
+        <div class="modal-content bg-white rounded-lg p-4 sm:p-6">
+            <h3 class="text-lg font-semibold mb-4">Editar Aluno</h3>
+            <div class="space-y-4">
+                <input type="text" id="editNomeAluno" placeholder="Nome do aluno" class="w-full px-4 py-2 border rounded-lg">
+                <input type="date" id="editAniversarioAluno" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="editMoedasAluno" placeholder="Moedas" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="editSaudeAluno" placeholder="Saúde" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="editFelicidadeAluno" placeholder="Felicidade" class="w-full px-4 py-2 border rounded-lg">
+                <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                    <button onclick="salvarEdicaoAluno()" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Salvar</button>
+                    <button onclick="closeModal('modalEditarAluno')" class="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Próximo Mês -->
+    <div id="modalProximoMes" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
+        <div class="modal-content bg-white rounded-lg p-4 sm:p-6">
+            <h3 class="text-lg font-semibold mb-4">🗓️ Próximo Mês</h3>
+            <div class="space-y-4">
+                <p class="text-sm text-gray-600">Insira um valor para deduzir das moedas de todos os alunos presentes. Isso simula despesas mensais.</p>
+                <input type="number" id="despesasMensais" placeholder="Valor das Despesas" class="w-full px-4 py-2 border rounded-lg">
+                <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                    <button onclick="proximoMes()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Confirmar</button>
+                    <button onclick="closeModal('modalProximoMes')" class="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Missão -->
+    <div id="modalMissao" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
+        <div class="modal-content bg-white rounded-lg p-4 sm:p-6">
+            <h3 class="text-lg font-semibold mb-4">Nova Missão</h3>
+            <div class="space-y-4">
+                <input type="text" id="tituloMissao" placeholder="Título da missão" class="w-full px-4 py-2 border rounded-lg">
+                <textarea id="descricaoMissao" placeholder="Descrição" class="w-full px-4 py-2 border rounded-lg h-20"></textarea>
+                <input type="number" id="recompensaMissao" placeholder="Recompensa (moedas)" class="w-full px-4 py-2 border rounded-lg">
+                <select id="categoriaMissao" class="w-full px-4 py-2 border rounded-lg">
+                    <option value="individual">Individual</option>
+                    <option value="turma">Turma</option>
+                    <option value="recuperacao">Recuperação</option>
+                </select>
+                <select id="dificuldadeMissao" class="w-full px-4 py-2 border rounded-lg">
+                    <option value="facil">Fácil</option>
+                    <option value="media">Média</option>
+                    <option value="dificil">Difícil</option>
+                </select>
+                <div class="flex space-x-2">
+                    <button onclick="salvarMissao()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex-1">Salvar</button>
+                    <button onclick="closeModal('modalMissao')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex-1">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Produto -->
+    <div id="modalProduto" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="modal-content bg-white rounded-lg p-6 w-96 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-lg font-semibold mb-4">Novo Item da Loja</h3>
+            <div class="space-y-4">
+                <input type="text" id="nomeProduto" placeholder="Nome do produto" class="w-full px-4 py-2 border rounded-lg">
+                <textarea id="descricaoProduto" placeholder="Descrição" class="w-full px-4 py-2 border rounded-lg h-20"></textarea>
+                <input type="url" id="imagemProduto" placeholder="URL da imagem" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="valorProduto" placeholder="Valor (moedas)" class="w-full px-4 py-2 border rounded-lg">
+                <input type="text" id="categoriaProduto" placeholder="Categoria" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="efeitoSaudeProduto" placeholder="Efeito na Saúde (+/-)" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="efeitoFelicidadeProduto" placeholder="Efeito na Felicidade (+/-)" class="w-full px-4 py-2 border rounded-lg">
+                <div class="flex space-x-2">
+                    <button onclick="salvarProduto()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex-1">Salvar</button>
+                    <button onclick="closeModal('modalProduto')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex-1">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Venda -->
+    <div id="modalVenda" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="modal-content bg-white rounded-lg p-6 w-96 max-h-96 overflow-y-auto">
+            <h3 class="text-lg font-semibold mb-4">🛒 Vender Produto</h3>
+            <div id="produtoVendaInfo" class="mb-4 p-4 bg-gray-50 rounded-lg"></div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Selecionar Aluno:</label>
+                    <select id="alunoComprador" class="w-full px-4 py-2 border rounded-lg">
+                        <option value="">Selecionar Aluno</option>
+                    </select>
+                </div>
+                <div id="infoAluno" class="hidden p-3 bg-blue-50 rounded-lg">
+                    <div class="text-sm">
+                        <div>💰 Moedas disponíveis: <span id="moedasAluno" class="font-semibold">0</span></div>
+                        <div id="statusCompra" class="mt-2"></div>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="confirmarVenda()" id="btnConfirmarVenda" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex-1" disabled>Confirmar Venda</button>
+                    <button onclick="closeModal('modalVenda')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex-1">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Visualizar Imagem -->
+    <div id="modalImagem" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center z-[1200]" onclick="closeModal('modalImagem')">
+        <img id="imagemAmpliada" src="" class="max-w-[90vw] max-h-[90vh] rounded-lg shadow-2xl" alt="Imagem Ampliada">
+    </div>
+
+    <script>
+        // Dados globais
+        let currentSection = 'alunos';
+        let currentEditingStudent = null;
+        let currentEditingMission = null;
+        let currentEditingProduct = null;
+        let alunosSorteados = [];
+
+        // Sistema de notificações
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-emerald-500 border-emerald-600',
+                error: 'bg-red-500 border-red-600',
+                warning: 'bg-amber-500 border-amber-600',
+                info: 'bg-slate-500 border-slate-600'
+            };
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+            
+            notification.className = `notification ${colors[type]} text-white p-4 rounded-lg shadow-lg border-l-4`;
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <i class="${icons[type]}"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-auto text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Mostrar notificação
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Remover automaticamente após 5 segundos
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+
+        const turmas = ["M21", "M22", "T21", "T22", "M31", "M32", "T31", "T32", "M41", "M42", "T41", "T42", "M51", "M52", "T51", "T52", "M61", "M62", "T61", "T62"];
+        
+        // Configurações do RoboHash
+        const roboHashSets = ['set1', 'set2', 'set3', 'set4']; // Diferentes estilos de robôs
+        const roboHashBgs = ['bg1', 'bg2', 'transparent']; // Diferentes fundos
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeData();
+            populateSelects();
+            showSection('alunos');
+            buscarFrase();
+            
+            // Event listeners para sidebar responsiva
+            setupResponsiveSidebar();
+        });
+
+        function initializeData() {
+            if (!localStorage.getItem('alunos')) {
+                localStorage.setItem('alunos', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('missoes')) {
+                localStorage.setItem('missoes', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('produtos')) {
+                localStorage.setItem('produtos', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('chamadas')) {
+                localStorage.setItem('chamadas', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('compras')) {
+                localStorage.setItem('compras', JSON.stringify([]));
+            }
+        }
+
+        function populateSelects() {
+            const selects = ['filtroTurma', 'turmaAluno', 'turmaChamada', 'turmaSorteio', 'turmaRecompensa', 'turmaCadastroMassa'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    while (select.children.length > 1) {
+                        select.removeChild(select.lastChild);
+                    }
+                    turmas.forEach(turma => {
+                        const option = document.createElement('option');
+                        option.value = turma;
+                        option.textContent = turma;
+                        select.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        function obterAvatarAleatorio(nome = null) {
+            // Se um nome for fornecido, usar como seed para consistência
+            const seed = nome || Math.random().toString(36).substring(7);
+            const set = roboHashSets[Math.floor(Math.random() * roboHashSets.length)];
+            const bg = roboHashBgs[Math.floor(Math.random() * roboHashBgs.length)];
+            
+            return `https://robohash.org/${encodeURIComponent(seed)}.png?set=${set}&bgset=${bg}&size=80x80`;
+        }
+
+        function gerarAvatarPorNome(nome) {
+            // Gera um avatar consistente baseado no nome do aluno
+            const set = roboHashSets[nome.length % roboHashSets.length];
+            const bg = roboHashBgs[nome.charCodeAt(0) % roboHashBgs.length];
+            
+            return `https://robohash.org/${encodeURIComponent(nome)}.png?set=${set}&bgset=${bg}&size=80x80`;
+        }
+
+        function ehAniversariante(aniversario) {
+            if (!aniversario) return false;
+            const hoje = new Date();
+            // Usar UTC para evitar problemas de fuso horário
+            const dataAniversario = new Date(aniversario + 'T00:00:00');
+            return hoje.getMonth() === dataAniversario.getMonth();
+        }
+
+        function setupResponsiveSidebar() {
+            // Mobile elements
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileSidebar = document.getElementById('mobileSidebar');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            
+            // Desktop elements
+            const desktopSidebarTrigger = document.getElementById('desktopSidebarTrigger');
+            const desktopSidebar = document.getElementById('desktopSidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            let sidebarTimeout;
+            let isMobile = window.innerWidth < 1024;
+            let isMobileSidebarOpen = false;
+            
+            // Mobile menu functionality
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    toggleMobileSidebar();
+                });
+            }
+            
+            // Mobile overlay click to close
+            if (mobileOverlay) {
+                mobileOverlay.addEventListener('click', function() {
+                    hideMobileSidebar();
+                });
+            }
+            
+            // Desktop auto-hide functionality
+            if (desktopSidebarTrigger) {
+                desktopSidebarTrigger.addEventListener('mouseenter', function() {
+                    if (!isMobile) {
+                        clearTimeout(sidebarTimeout);
+                        showDesktopSidebar();
+                    }
+                });
+                
+                desktopSidebarTrigger.addEventListener('mouseleave', function() {
+                    if (!isMobile) {
+                        sidebarTimeout = setTimeout(hideDesktopSidebar, 300);
+                    }
+                });
+            }
+            
+            if (desktopSidebar) {
+                desktopSidebar.addEventListener('mouseenter', function() {
+                    if (!isMobile) {
+                        clearTimeout(sidebarTimeout);
+                    }
+                });
+                
+                desktopSidebar.addEventListener('mouseleave', function() {
+                    if (!isMobile) {
+                        sidebarTimeout = setTimeout(hideDesktopSidebar, 300);
+                    }
+                });
+            }
+            
+            // Mobile sidebar functions
+            function toggleMobileSidebar() {
+                if (isMobileSidebarOpen) {
+                    hideMobileSidebar();
+                } else {
+                    showMobileSidebar();
+                }
+            }
+            
+            function showMobileSidebar() {
+                if (mobileSidebar && mobileOverlay && mobileMenuBtn) {
+                    mobileSidebar.classList.add('open');
+                    mobileOverlay.classList.add('show');
+                    mobileMenuBtn.classList.add('active');
+                    isMobileSidebarOpen = true;
+                    document.body.style.overflow = 'hidden'; // Prevent scrolling
+                }
+            }
+            
+            function hideMobileSidebar() {
+                if (mobileSidebar && mobileOverlay && mobileMenuBtn) {
+                    mobileSidebar.classList.remove('open');
+                    mobileOverlay.classList.remove('show');
+                    mobileMenuBtn.classList.remove('active');
+                    isMobileSidebarOpen = false;
+                    document.body.style.overflow = ''; // Restore scrolling
+                }
+            }
+            
+            // Desktop sidebar functions
+            function showDesktopSidebar() {
+                if (desktopSidebar && mainContent) {
+                    desktopSidebar.classList.add('show');
+                    mainContent.style.marginLeft = '16rem';
+                }
+            }
+            
+            function hideDesktopSidebar() {
+                if (desktopSidebar && mainContent) {
+                    desktopSidebar.classList.remove('show');
+                    mainContent.style.marginLeft = '0';
+                }
+            }
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const wasMobile = isMobile;
+                isMobile = window.innerWidth < 1024;
+                
+                if (wasMobile !== isMobile) {
+                    // Reset all states when switching between mobile/desktop
+                    hideMobileSidebar();
+                    hideDesktopSidebar();
+                    clearTimeout(sidebarTimeout);
+                }
+            });
+            
+            // Close mobile sidebar when clicking nav items
+            const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+            mobileNavItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Small delay to allow the section change to happen first
+                    setTimeout(() => {
+                        hideMobileSidebar();
+                        updateActiveNavItem(this);
+                    }, 100);
+                });
+            });
+            
+            // Update active nav item
+            function updateActiveNavItem(clickedItem) {
+                // Remove active class from all mobile nav items
+                mobileNavItems.forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                if (clickedItem && clickedItem.classList.contains('mobile-nav-item')) {
+                    clickedItem.classList.add('active');
+                }
+            }
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(section).classList.remove('hidden');
+            currentSection = section;
+
+            switch(section) {
+                case 'alunos':
+                    filtrarAlunos(); // Changed from renderAlunos() to persist filter
+                    break;
+                case 'chamada':
+                    renderChamada();
+                    break;
+                case 'missoes':
+                    renderMissoes();
+                    break;
+                case 'relatorios':
+                    renderRelatorios();
+                    break;
+                case 'loja':
+                    renderLoja();
+                    break;
+                case 'cadastroMassa':
+                    break;
+                case 'ferramentas':
+                    break;
+            }
+        }
+
+        // Funções de Cadastro em Massa
+        function cadastrarAlunosEmMassa() {
+            const turma = document.getElementById('turmaCadastroMassa').value;
+            const nomesTexto = document.getElementById('nomesAlunos').value.trim();
+
+            if (!turma) {
+                showNotification('Selecione uma turma primeiro!', 'warning');
+                return;
+            }
+
+            if (!nomesTexto) {
+                showNotification('Digite pelo menos um nome de aluno!', 'warning');
+                return;
+            }
+
+            const nomes = nomesTexto.split('\n').filter(nome => nome.trim() !== '');
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            let alunosCadastrados = 0;
+            let alunosJaExistentes = [];
+
+            nomes.forEach(nome => {
+                const nomeFormatado = nome.trim();
+                if (nomeFormatado) {
+                    // Verificar se já existe
+                    const jaExiste = alunos.some(aluno => 
+                        aluno.nome.toLowerCase() === nomeFormatado.toLowerCase() && aluno.turma === turma
+                    );
+
+                    if (!jaExiste) {
+                        const novoAluno = {
+                            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                            nome: nomeFormatado,
+                            turma,
+                            aniversario: '',
+                            moedas: 0,
+                            estrelas: 0,
+                            saude: 100,
+                            felicidade: 100,
+                            presente: false,
+                            avatar: gerarAvatarPorNome(nomeFormatado)
+                        };
+                        alunos.push(novoAluno);
+                        alunosCadastrados++;
+                    } else {
+                        alunosJaExistentes.push(nomeFormatado);
+                    }
+                }
+            });
+
+            localStorage.setItem('alunos', JSON.stringify(alunos));
+
+            // Mostrar resultado
+            const resultadoDiv = document.getElementById('resultadoCadastro');
+            const detalhesDiv = document.getElementById('detalhesResultado');
+            
+            let mensagem = `<p class="text-green-600">✅ ${alunosCadastrados} alunos cadastrados com sucesso na turma ${turma}!</p>`;
+            
+            if (alunosJaExistentes.length > 0) {
+                mensagem += `<p class="text-yellow-600 mt-2">⚠️ ${alunosJaExistentes.length} alunos já existiam: ${alunosJaExistentes.join(', ')}</p>`;
+            }
+
+            detalhesDiv.innerHTML = mensagem;
+            resultadoDiv.classList.remove('hidden');
+
+            // Limpar campo de texto
+            document.getElementById('nomesAlunos').value = '';
+
+            // Atualizar lista se estivermos na seção de alunos
+            if (currentSection === 'alunos') {
+                filtrarAlunos();
+            }
+            
+            // Atualizar selects
+            populateSelects();
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            // Limpar campos
+            const modal = document.getElementById(modalId);
+            modal.querySelectorAll('input, textarea, select').forEach(field => {
+                if (field.type !== 'button') field.value = '';
+            });
+        }
+        
+        function verImagem(src) {
+            if (src) {
+                document.getElementById('imagemAmpliada').src = src;
+                openModal('modalImagem');
+            }
+        }
+
+        // Funções de Alunos
+        function formatarNome(nomeCompleto) {
+            if (!nomeCompleto || typeof nomeCompleto !== 'string') return '';
+            const partes = nomeCompleto.trim().split(' ');
+            if (partes.length <= 1) {
+                return nomeCompleto;
+            }
+            return `${partes[0]} ${partes[partes.length - 1]}`;
+        }
+        
+        function renderAlunos() {
+            filtrarAlunos();
+        }
+        
+        function cardAlunoTemplate(aluno) {
+            const isAniversariante = ehAniversariante(aluno.aniversario);
+            const frequencia = calcularFrequencia(aluno.id);
+            const dataAniversario = aluno.aniversario ? new Date(aluno.aniversario + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+            const nomeFormatado = formatarNome(aluno.nome);
+
+            let cardBorderClass = 'border-slate-200';
+            let cardBgClass = 'bg-white';
+            
+            if (isAniversariante) {
+                cardBorderClass = 'border-yellow-400';
+                cardBgClass = 'bg-gradient-to-br from-yellow-50 to-amber-50';
+            } else if (frequencia >= 90) {
+                cardBorderClass = 'border-emerald-400';
+            } else if (frequencia >= 75) {
+                cardBorderClass = 'border-blue-400';
+            } else if (frequencia < 60) {
+                cardBorderClass = 'border-red-400';
+            }
+            
+            return `
+            <div class="student-card ${cardBgClass} rounded-xl shadow-lg border-2 ${cardBorderClass} p-4 sm:p-6 relative overflow-hidden group hover:shadow-xl transition-all duration-300 ${isAniversariante ? 'ring-2 ring-yellow-300 ring-opacity-50' : ''}">
+                ${isAniversariante ? '<div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-yellow-400 to-amber-500 rounded-bl-full flex items-start justify-end p-2"><span class="text-white text-xs">🎂</span></div>' : ''}
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-4 min-w-0">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-20 h-20 rounded-2xl overflow-hidden border-3 ${isAniversariante ? 'border-yellow-400' : 'border-slate-200'} shadow-lg bg-gradient-to-br from-slate-100 to-slate-200">
+                                <img src="${aluno.avatar || gerarAvatarPorNome(aluno.nome)}" 
+                                     alt="Avatar de ${aluno.nome}" 
+                                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik00MCA0MEMzNS41ODE3IDQwIDMyIDM2LjQxODMgMzIgMzJDMzIgMjcuNTgxNyAzNS41ODE3IDI0IDQwIDI0QzQ0LjQxODMgMjQgNDggMjcuNTgxNyA0OCAzMkM0OCAzNi41ODE3IDQ0LjQxODMgNDAgNDAgNDBaTTQwIDQ0QzMwLjA1ODkgNDQgMjIgNTEuMTYzNCAyMiA2MEgyMkMyMiA2MC41NTIzIDIyLjQ0NzcgNjEgMjMgNjFINTdDNTcuNTUyMyA2MSA1OCA2MC41NTIzIDU4IDYwQzU4IDUxLjE2MzQgNDkuOTQxMSA0NCA0MCA0NFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+'; this.alt='Avatar padrão';">
+                            </div>
+                            <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full ${aluno.presente ? 'bg-emerald-500' : 'bg-slate-400'} border-2 border-white shadow-sm flex items-center justify-center">
+                                <i class="fas ${aluno.presente ? 'fa-check' : 'fa-times'} text-white text-xs"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-1 leading-tight truncate" title="${aluno.nome}">${nomeFormatado}</h3>
+                            <div class="flex items-center space-x-3 text-xs sm:text-sm">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                                    ${aluno.turma}
+                                </span>
+                                ${dataAniversario ? `<span class="text-slate-500 hidden sm:inline">📅 ${dataAniversario}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 ml-2">
+                        <button onclick="regenerarAvatar('${aluno.id}')" class="p-2 text-purple-500 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-colors" title="Regenerar Avatar">
+                            <i class="fas fa-sync-alt text-sm"></i>
+                        </button>
+                        <button onclick="editarAluno('${aluno.id}')" class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors" title="Editar Aluno">
+                            <i class="fas fa-edit text-sm"></i>
+                        </button>
+                        <button onclick="deletarAluno('${aluno.id}')" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" title="Deletar Aluno">
+                            <i class="fas fa-trash text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mb-4 bg-slate-50 rounded-lg p-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">💰</span>
+                        <span class="text-lg font-bold text-amber-600">${aluno.moedas || 0}</span>
+                    </div>
+                    <div class="flex items-center space-x-3 text-sm">
+                        <div class="flex items-center space-x-1">
+                            <span class="text-red-500">❤️</span>
+                            <span class="font-bold text-slate-800">${aluno.saude || 100}</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-green-500">😊</span>
+                            <span class="font-bold text-slate-800">${aluno.felicidade || 100}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-slate-600">Frequência</span>
+                        <span class="text-sm font-bold ${getFrequenciaColor(frequencia)}">${frequencia}%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-500 ${getFrequenciaBarColor(frequencia)}" style="width: ${frequencia}%"></div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+
+        function salvarAluno() {
+            const nome = document.getElementById('nomeAluno').value;
+            const turma = document.getElementById('turmaAluno').value;
+            const aniversario = document.getElementById('aniversarioAluno').value;
+
+            if (!nome || !turma) {
+                showNotification('Por favor, preencha todos os campos obrigatórios.', 'warning');
+                return;
+            }
+
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const novoAluno = {
+                id: Date.now().toString(),
+                nome,
+                turma,
+                aniversario,
+                moedas: 0,
+                estrelas: 0,
+                saude: 100,
+                felicidade: 100,
+                presente: false,
+                avatar: gerarAvatarPorNome(nome)
+            };
+
+            alunos.push(novoAluno);
+            localStorage.setItem('alunos', JSON.stringify(alunos));
+            closeModal('modalCadastroAluno');
+            filtrarAlunos();
+            showNotification(`Aluno ${nome} cadastrado com sucesso!`, 'success');
+        }
+
+        function editarAluno(id) {
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const aluno = alunos.find(a => a.id === id);
+            
+            if (aluno) {
+                currentEditingStudent = id;
+                document.getElementById('editNomeAluno').value = aluno.nome;
+                document.getElementById('editAniversarioAluno').value = aluno.aniversario || '';
+                document.getElementById('editMoedasAluno').value = aluno.moedas || 0;
+                document.getElementById('editSaudeAluno').value = aluno.saude || 100;
+                document.getElementById('editFelicidadeAluno').value = aluno.felicidade || 100;
+                openModal('modalEditarAluno');
+            }
+        }
+
+        function salvarEdicaoAluno() {
+            if (!currentEditingStudent) return;
+
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const index = alunos.findIndex(a => a.id === currentEditingStudent);
+            
+            if (index !== -1) {
+                alunos[index].nome = document.getElementById('editNomeAluno').value;
+                alunos[index].aniversario = document.getElementById('editAniversarioAluno').value;
+                alunos[index].moedas = parseInt(document.getElementById('editMoedasAluno').value) || 0;
+                alunos[index].saude = parseInt(document.getElementById('editSaudeAluno').value) || 100;
+                alunos[index].felicidade = parseInt(document.getElementById('editFelicidadeAluno').value) || 100;
+                
+                localStorage.setItem('alunos', JSON.stringify(alunos));
+                closeModal('modalEditarAluno');
+                filtrarAlunos();
+                showNotification('Aluno atualizado com sucesso!', 'success');
+            }
+        }
+
+        function regenerarAvatar(id) {
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const index = alunos.findIndex(a => a.id === id);
+            
+            if (index !== -1) {
+                // Gera um novo avatar com um seed aleatório baseado no nome + timestamp
+                const novoSeed = alunos[index].nome + Date.now();
+                alunos[index].avatar = obterAvatarAleatorio(novoSeed);
+                localStorage.setItem('alunos', JSON.stringify(alunos));
+                filtrarAlunos();
+                showNotification(`Avatar de ${alunos[index].nome} regenerado!`, 'success');
+            }
+        }
+
+        function deletarAluno(id) {
+            if (confirm('Deseja realmente deletar este aluno? Esta ação não pode ser desfeita.')) {
+                const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+                const aluno = alunos.find(a => a.id === id);
+                const novosAlunos = alunos.filter(a => a.id !== id);
+                localStorage.setItem('alunos', JSON.stringify(novosAlunos));
+                filtrarAlunos();
+                showNotification(`Aluno ${aluno?.nome || ''} removido com sucesso!`, 'info');
+            }
+        }
+
+        function filtrarAlunos() {
+            const turmaFiltro = document.getElementById('filtroTurma').value;
+            const pesquisa = document.getElementById('pesquisarAluno').value.toLowerCase();
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            
+            const alunosFiltrados = alunos.filter(aluno => {
+                const matchTurma = !turmaFiltro || aluno.turma === turmaFiltro;
+                const matchNome = !pesquisa || aluno.nome.toLowerCase().includes(pesquisa);
+                return matchTurma && matchNome;
+            });
+
+            const container = document.getElementById('listaAlunos');
+            if (alunosFiltrados.length === 0) {
+                 container.innerHTML = `<div class="col-span-full text-center py-10 px-4 bg-slate-100 rounded-lg">
+                        <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-700">Nenhum aluno encontrado</h3>
+                        <p class="text-gray-500">Tente ajustar os filtros de turma ou pesquisa.</p>
+                    </div>`;
+                return;
+            }
+            container.innerHTML = alunosFiltrados.map(aluno => cardAlunoTemplate(aluno)).join('');
+        }
+
+        function getFrequenciaColor(frequencia) {
+            if (frequencia >= 90) return 'text-emerald-600';
+            if (frequencia >= 75) return 'text-blue-600';
+            if (frequencia >= 60) return 'text-amber-600';
+            return 'text-red-600';
+        }
+
+        function getFrequenciaBarColor(frequencia) {
+            if (frequencia >= 90) return 'bg-gradient-to-r from-emerald-400 to-emerald-500';
+            if (frequencia >= 75) return 'bg-gradient-to-r from-blue-400 to-blue-500';
+            if (frequencia >= 60) return 'bg-gradient-to-r from-amber-400 to-amber-500';
+            return 'bg-gradient-to-r from-red-400 to-red-500';
+        }
+
+        function calcularFrequencia(alunoId) {
+            const chamadas = JSON.parse(localStorage.getItem('chamadas') || '[]');
+            const chamadasDoAluno = chamadas.filter(c => {
+                const alunosDaTurma = JSON.parse(localStorage.getItem('alunos') || '[]').filter(a => a.turma === c.turma).map(a => a.id);
+                return alunosDaTurma.includes(alunoId);
+            });
+
+            if (chamadasDoAluno.length === 0) return 100; // Se não houver chamadas para a turma do aluno, considera 100%
+
+            const presencas = chamadasDoAluno.filter(c => c.presentes && c.presentes.includes(alunoId));
+            return Math.round((presencas.length / chamadasDoAluno.length) * 100);
+        }
+        
+        // Funções de "Próximo Mês"
+        function proximoMes() {
+            const despesas = parseInt(document.getElementById('despesasMensais').value);
+            const turmaFiltro = document.getElementById('filtroTurma').value;
+
+            if (isNaN(despesas) || despesas < 0) {
+                showNotification('Por favor, insira um valor de despesa válido.', 'warning');
+                return;
+            }
+
+            closeModal('modalProximoMes');
+            
+            const overlay = document.getElementById('mesOverlay');
+            overlay.style.display = 'flex';
+
+            setTimeout(() => {
+                overlay.style.backgroundColor = 'rgba(0,0,0,0.75)';
+            }, 10);
+
+            setTimeout(() => {
+                const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+                let alunosAfetados = 0;
+                alunos.forEach(aluno => {
+                    const matchTurma = !turmaFiltro || aluno.turma === turmaFiltro;
+                    if (aluno.presente && matchTurma) {
+                        aluno.moedas = Math.max(0, (aluno.moedas || 0) - despesas);
+                        alunosAfetados++;
+                    }
+                });
+                localStorage.setItem('alunos', JSON.stringify(alunos));
+                
+                showNotification(`${alunosAfetados} alunos da turma ${turmaFiltro || 'selecionada'} tiveram ${despesas} moedas deduzidas.`, 'info');
+
+                setTimeout(() => {
+                    filtrarAlunos();
+                    overlay.style.backgroundColor = 'rgba(0,0,0,0)';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 500);
+                }, 1000);
+
+            }, 1000);
+        }
+
+
+        // Funções de Chamada
+        function renderChamada() {
+            const container = document.getElementById('chamadaContent');
+            container.innerHTML = `
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <p class="text-gray-600">Selecione uma turma para fazer a chamada.</p>
+                </div>
+            `;
+            renderHistoricoChamadas();
+        }
+
+        function novaChamada() {
+            const turma = document.getElementById('turmaChamada').value;
+            if (!turma) {
+                showNotification('Selecione uma turma primeiro!', 'warning');
+                return;
+            }
+
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const alunosTurma = alunos.filter(a => a.turma === turma);
+
+            if (alunosTurma.length === 0) {
+                showNotification('Nenhum aluno encontrado nesta turma!', 'warning');
+                return;
+            }
+
+            const container = document.getElementById('chamadaContent');
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-lg border">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-2 sm:space-y-0">
+                        <h3 class="text-lg font-semibold">Chamada - Turma ${turma}</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="marcarTodos(true)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">Marcar Todos</button>
+                            <button onclick="marcarTodos(false)" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">Desmarcar Todos</button>
+                            <button onclick="salvarChamada()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Salvar Chamada</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${alunosTurma.map(aluno => `
+                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" class="chamada-checkbox rounded" data-aluno-id="${aluno.id}" checked>
+                                <span class="font-medium">${aluno.nome}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function marcarTodos(presente) {
+            document.querySelectorAll('.chamada-checkbox').forEach(checkbox => {
+                checkbox.checked = presente;
+            });
+        }
+
+        function salvarChamada() {
+            const turma = document.getElementById('turmaChamada').value;
+            const presentes = Array.from(document.querySelectorAll('.chamada-checkbox:checked'))
+                .map(cb => cb.dataset.alunoId);
+            
+            const chamadas = JSON.parse(localStorage.getItem('chamadas') || '[]');
+            const novaChamada = {
+                id: Date.now().toString(),
+                turma,
+                data: new Date().toISOString(),
+                presentes,
+                total: document.querySelectorAll('.chamada-checkbox').length
+            };
+
+            chamadas.push(novaChamada);
+            localStorage.setItem('chamadas', JSON.stringify(chamadas));
+            
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            alunos.forEach(aluno => {
+                 if (aluno.turma === turma) {
+                    aluno.presente = presentes.includes(aluno.id);
+                 }
+            });
+            localStorage.setItem('alunos', JSON.stringify(alunos));
+
+            showNotification('Chamada salva com sucesso!', 'success');
+            renderChamada();
+        }
+
+        function renderHistoricoChamadas() {
+            const chamadas = JSON.parse(localStorage.getItem('chamadas') || '[]');
+            const container = document.getElementById('historicoChamadas');
+            
+            chamadas.sort((a,b) => new Date(b.data) - new Date(a.data));
+
+            container.innerHTML = `
+                <h3 class="text-lg font-semibold mb-4">📅 Histórico de Chamadas</h3>
+                <div class="space-y-4">
+                    ${chamadas.map(chamada => `
+                        <div class="bg-white p-4 rounded-lg border flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">Turma ${chamada.turma} - ${new Date(chamada.data).toLocaleDateString('pt-BR')}</div>
+                                <div class="text-sm text-gray-600">
+                                    Presentes: ${chamada.presentes.length}/${chamada.total} 
+                                    (${chamada.total > 0 ? Math.round((chamada.presentes.length / chamada.total) * 100) : 0}%)
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="editarChamada('${chamada.id}')" class="text-blue-500 hover:text-blue-700" title="Editar chamada">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deletarChamada('${chamada.id}')" class="text-red-500 hover:text-red-700" title="Deletar chamada">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function editarChamada(id) {
+            const chamadas = JSON.parse(localStorage.getItem('chamadas') || '[]');
+            const chamada = chamadas.find(c => c.id === id);
+            
+            if (!chamada) return;
+            
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const alunosTurma = alunos.filter(a => a.turma === chamada.turma);
+            
+            const container = document.getElementById('chamadaContent');
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-lg border">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">✏️ Editar Chamada - Turma ${chamada.turma} (${new Date(chamada.data).toLocaleDateString('pt-BR')})</h3>
+                        <div class="space-x-2">
+                            <button onclick="salvarEdicaoChamada('${id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Salvar Alterações</button>
+                            <button onclick="renderChamada()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${alunosTurma.map(aluno => `
+                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" class="chamada-checkbox" data-aluno-id="${aluno.id}" ${chamada.presentes.includes(aluno.id) ? 'checked' : ''}>
+                                <span class="font-medium">${aluno.nome}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function salvarEdicaoChamada(id) {
+            const presentes = Array.from(document.querySelectorAll('.chamada-checkbox:checked'))
+                .map(cb => cb.dataset.alunoId);
+            
+            const chamadas = JSON.parse(localStorage.getItem('chamadas') || '[]');
+            const index = chamadas.findIndex(c => c.id === id);
+            
+            if (index !== -1) {
+                chamadas[index].presentes = presentes;
+                localStorage.setItem('chamadas', JSON.stringify(chamadas));
+                
+                showNotification('Chamada atualizada com sucesso!', 'success');
+                renderChamada();
+            }
+        }
+
+        function deletarChamada(id) {
+            if (confirm('Deseja realmente deletar esta chamada?')) {
+                const chamadas = JSON.parse(localStorage.getItem('chamadas') || '[]');
+                const novasChamadas = chamadas.filter(c => c.id !== id);
+                localStorage.setItem('chamadas', JSON.stringify(novasChamadas));
+                renderHistoricoChamadas();
+                showNotification('Chamada deletada!', 'info');
+            }
+        }
+
+        // Funções de Missões (sem alterações)
+        function renderMissoes() {
+            const missoes = JSON.parse(localStorage.getItem('missoes') || '[]');
+            const container = document.getElementById('listaMissoes');
+            
+            container.innerHTML = missoes.map(missao => `
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 ${getDificuldadeCor(missao.dificuldade)}">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">${missao.titulo}</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="editarMissao('${missao.id}')" class="text-blue-500 hover:text-blue-700">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deletarMissao('${missao.id}')" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">${missao.descricao}</p>
+                    <div class="space-y-2 text-sm">
+                        <div><span class="font-semibold">Recompensa:</span> 💰 ${missao.recompensa} moedas</div>
+                        <div><span class="font-semibold">Categoria:</span> ${missao.categoria}</div>
+                        <div><span class="font-semibold">Dificuldade:</span> ${getDificuldadeIcon(missao.dificuldade)} ${missao.dificuldade}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getDificuldadeCor(dificuldade) {
+            switch(dificuldade) {
+                case 'facil': return 'border-green-500';
+                case 'media': return 'border-yellow-500';
+                case 'dificil': return 'border-red-500';
+                default: return 'border-gray-500';
+            }
+        }
+
+        function getDificuldadeIcon(dificuldade) {
+            switch(dificuldade) {
+                case 'facil': return '🟢';
+                case 'media': return '🟡';
+                case 'dificil': return '🔴';
+                default: return '⚪';
+            }
+        }
+
+        function salvarMissao() {
+            const titulo = document.getElementById('tituloMissao').value;
+            const descricao = document.getElementById('descricaoMissao').value;
+            const recompensa = document.getElementById('recompensaMissao').value;
+            const categoria = document.getElementById('categoriaMissao').value;
+            const dificuldade = document.getElementById('dificuldadeMissao').value;
+
+            if (!titulo || !descricao || !recompensa) {
+                showNotification('Por favor, preencha todos os campos obrigatórios.', 'warning');
+                return;
+            }
+
+            const missoes = JSON.parse(localStorage.getItem('missoes') || '[]');
+            
+            if (currentEditingMission) {
+                const index = missoes.findIndex(m => m.id === currentEditingMission);
+                if (index !== -1) {
+                    missoes[index] = { ...missoes[index], titulo, descricao, recompensa: parseInt(recompensa), categoria, dificuldade };
+                }
+                currentEditingMission = null;
+            } else {
+                const novaMissao = {
+                    id: Date.now().toString(),
+                    titulo,
+                    descricao,
+                    recompensa: parseInt(recompensa),
+                    categoria,
+                    dificuldade
+                };
+                missoes.push(novaMissao);
+            }
+
+            localStorage.setItem('missoes', JSON.stringify(missoes));
+            closeModal('modalMissao');
+            renderMissoes();
+        }
+
+        function editarMissao(id) {
+            const missoes = JSON.parse(localStorage.getItem('missoes') || '[]');
+            const missao = missoes.find(m => m.id === id);
+            
+            if (missao) {
+                currentEditingMission = id;
+                document.getElementById('tituloMissao').value = missao.titulo;
+                document.getElementById('descricaoMissao').value = missao.descricao;
+                document.getElementById('recompensaMissao').value = missao.recompensa;
+                document.getElementById('categoriaMissao').value = missao.categoria;
+                document.getElementById('dificuldadeMissao').value = missao.dificuldade;
+                openModal('modalMissao');
+            }
+        }
+
+        function deletarMissao(id) {
+            if (confirm('Deseja realmente deletar esta missão?')) {
+                const missoes = JSON.parse(localStorage.getItem('missoes') || '[]');
+                const novasMissoes = missoes.filter(m => m.id !== id);
+                localStorage.setItem('missoes', JSON.stringify(novasMissoes));
+                renderMissoes();
+            }
+        }
+
+        // Funções da Loja
+        function renderLoja(searchTerm = '') {
+            const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+            const container = document.getElementById('listaProdutos');
+            
+            const produtosFiltrados = produtos.filter(p => p.nome.toLowerCase().includes(searchTerm.toLowerCase()));
+
+            if (produtosFiltrados.length === 0) {
+                 container.innerHTML = `<div class="col-span-full text-center py-10 px-4 bg-slate-100 rounded-lg">
+                        <i class="fas fa-store-slash text-4xl text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-700">Nenhum item encontrado</h3>
+                        <p class="text-gray-500">Tente pesquisar por outro nome ou adicione novos itens.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = produtosFiltrados.map(produto => {
+                const efeitoSaude = produto.efeitoSaude || 0;
+                const efeitoFelicidade = produto.efeitoFelicidade || 0;
+                return `
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden group relative" style="aspect-ratio: 5/7;">
+                    <!-- Imagem de fundo clicável -->
+                    <button class="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-200 w-full h-full" onclick="verImagem('${produto.imagem}')">
+                        ${produto.imagem ? 
+                            `<img src="${produto.imagem}" alt="${produto.nome}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-6xl text-slate-400\\'>🛍️</div>';">` : 
+                            `<div class="w-full h-full flex items-center justify-center text-6xl text-slate-400">🛍️</div>`
+                        }
+                    </button>
+                    
+                    <!-- Overlay escuro para melhor legibilidade -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+                    
+                    <!-- Header com botões de ação -->
+                    <div class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <div class="flex space-x-1">
+                            <button onclick="venderProduto('${produto.id}')" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-lg transition-colors backdrop-blur-sm" title="Vender Produto">
+                                <i class="fas fa-shopping-cart text-xs"></i>
+                            </button>
+                            <button onclick="editarProduto('${produto.id}')" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition-colors backdrop-blur-sm" title="Editar Produto">
+                                <i class="fas fa-edit text-xs"></i>
+                            </button>
+                            <button onclick="deletarProduto('${produto.id}')" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transition-colors backdrop-blur-sm" title="Deletar Produto">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Badge de vendas -->
+                    ${(produto.vendas || 0) > 0 ? `
+                        <div class="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm z-10">
+                            ${produto.vendas} vendas
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Conteúdo sobreposto na parte inferior -->
+                    <div class="absolute bottom-0 left-0 right-0 p-3 z-10 pointer-events-none">
+                        <!-- Título -->
+                        <h3 class="text-white font-bold mb-2 line-clamp-1 leading-tight text-shadow-lg">${produto.nome}</h3>
+                        
+                        <!-- Efeitos -->
+                         <div class="flex items-center space-x-4 text-base font-medium mb-3">
+                            <span class="flex items-center space-x-1 text-white/90">
+                                <span class="text-red-400">❤️</span>
+                                <span>${efeitoSaude > 0 ? '+' : ''}${efeitoSaude}</span>
+                            </span>
+                            <span class="flex items-center space-x-1 text-white/90">
+                                <span class="text-green-400">😊</span>
+                                <span>${efeitoFelicidade > 0 ? '+' : ''}${efeitoFelicidade}</span>
+                            </span>
+                        </div>
+                        
+                        <!-- Preço e botão de compra -->
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-lg font-bold text-white text-shadow-lg">
+                                💰 ${produto.valor} <span class="text-sm font-normal">moedas</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="venderProduto('${produto.id}')" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-2 px-3 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/20 pointer-events-auto">
+                            🛒 Comprar
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+        
+        function filtrarProdutos() {
+            const searchTerm = document.getElementById('pesquisarProduto').value;
+            renderLoja(searchTerm);
+        }
+
+        function salvarProduto() {
+            const nome = document.getElementById('nomeProduto').value;
+            const descricao = document.getElementById('descricaoProduto').value;
+            const imagem = document.getElementById('imagemProduto').value;
+            const valor = document.getElementById('valorProduto').value;
+            const categoria = document.getElementById('categoriaProduto').value;
+            const efeitoSaude = parseInt(document.getElementById('efeitoSaudeProduto').value) || 0;
+            const efeitoFelicidade = parseInt(document.getElementById('efeitoFelicidadeProduto').value) || 0;
+
+            if (!nome || !descricao || !valor) {
+                showNotification('Por favor, preencha nome, descrição e valor.', 'warning');
+                return;
+            }
+
+            const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+            
+            if (currentEditingProduct) {
+                const index = produtos.findIndex(p => p.id === currentEditingProduct);
+                if (index !== -1) {
+                    produtos[index] = { ...produtos[index], nome, descricao, imagem, valor: parseInt(valor), categoria, efeitoSaude, efeitoFelicidade };
+                }
+                currentEditingProduct = null;
+                showNotification('Produto atualizado com sucesso!', 'success');
+            } else {
+                const novoProduto = {
+                    id: Date.now().toString(),
+                    nome,
+                    descricao,
+                    imagem,
+                    valor: parseInt(valor),
+                    categoria,
+                    efeitoSaude,
+                    efeitoFelicidade,
+                    vendas: 0
+                };
+                produtos.push(novoProduto);
+                showNotification(`Produto "${nome}" adicionado à loja!`, 'success');
+            }
+
+            localStorage.setItem('produtos', JSON.stringify(produtos));
+            closeModal('modalProduto');
+            renderLoja();
+        }
+
+        function venderProduto(produtoId) {
+            const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+            const produto = produtos.find(p => p.id === produtoId);
+            
+            if (!produto) return;
+
+            // Mostrar informações do produto
+            document.getElementById('produtoVendaInfo').innerHTML = `
+                <div class="flex items-center space-x-3">
+                    ${produto.imagem ? `<img src="${produto.imagem}" alt="${produto.nome}" class="w-16 h-16 object-cover rounded" onerror="this.style.display='none'">` : ''}
+                    <div>
+                        <h4 class="font-semibold">${produto.nome}</h4>
+                        <p class="text-sm text-gray-600">${produto.descricao}</p>
+                        <p class="text-lg font-bold text-green-600">💰 ${produto.valor} moedas</p>
+                    </div>
+                </div>
+            `;
+
+            // Popular select de alunos
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const selectAluno = document.getElementById('alunoComprador');
+            selectAluno.innerHTML = '<option value="">Selecionar Aluno</option>';
+            
+            alunos.forEach(aluno => {
+                const option = document.createElement('option');
+                option.value = aluno.id;
+                option.textContent = `${aluno.nome} (${aluno.turma}) - 💰 ${aluno.moedas || 0}`;
+                selectAluno.appendChild(option);
+            });
+
+            // Event listener para mudança de aluno
+            selectAluno.onchange = function() {
+                verificarCompra(this.value, produto);
+            };
+
+            // Armazenar produto atual para venda
+            window.currentProductForSale = produto;
+            
+            openModal('modalVenda');
+        }
+
+        function verificarCompra(alunoId, produto) {
+            const infoDiv = document.getElementById('infoAluno');
+            const moedasSpan = document.getElementById('moedasAluno');
+            const statusDiv = document.getElementById('statusCompra');
+            const btnConfirmar = document.getElementById('btnConfirmarVenda');
+
+            if (!alunoId) {
+                infoDiv.classList.add('hidden');
+                btnConfirmar.disabled = true;
+                return;
+            }
+
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const aluno = alunos.find(a => a.id === alunoId);
+            
+            if (!aluno) return;
+
+            const moedasAluno = aluno.moedas || 0;
+            moedasSpan.textContent = moedasAluno;
+            
+            if (moedasAluno >= produto.valor) {
+                statusDiv.innerHTML = '<div class="text-green-600 font-semibold">✅ Pode comprar este produto!</div>';
+                statusDiv.className = 'mt-2 text-green-600';
+                btnConfirmar.disabled = false;
+                btnConfirmar.className = 'bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex-1';
+            } else {
+                const faltam = produto.valor - moedasAluno;
+                statusDiv.innerHTML = `<div class="text-red-600 font-semibold">❌ Faltam ${faltam} moedas para comprar</div>`;
+                statusDiv.className = 'mt-2 text-red-600';
+                btnConfirmar.disabled = true;
+                btnConfirmar.className = 'bg-gray-400 text-white px-4 py-2 rounded-lg flex-1 cursor-not-allowed';
+            }
+
+            infoDiv.classList.remove('hidden');
+        }
+
+        function confirmarVenda() {
+            const alunoId = document.getElementById('alunoComprador').value;
+            const produto = window.currentProductForSale;
+
+            if (!alunoId || !produto) return;
+
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const alunoIndex = alunos.findIndex(a => a.id === alunoId);
+            
+            if (alunoIndex === -1) return;
+
+            const alunoParaAtualizar = alunos[alunoIndex];
+            
+            // Verificar se ainda tem moedas suficientes
+            if ((alunoParaAtualizar.moedas || 0) < produto.valor) {
+                showNotification('Aluno não possui moedas suficientes!', 'error');
+                return;
+            }
+
+            // Deduzir moedas e aplicar efeitos
+            alunoParaAtualizar.moedas = (alunoParaAtualizar.moedas || 0) - produto.valor;
+            
+            const efeitoSaude = produto.efeitoSaude || 0;
+            const efeitoFelicidade = produto.efeitoFelicidade || 0;
+            
+            // Garante que saúde e felicidade existam antes de somar
+            let saudeAtual = typeof alunoParaAtualizar.saude === 'number' ? alunoParaAtualizar.saude : 100;
+            let felicidadeAtual = typeof alunoParaAtualizar.felicidade === 'number' ? alunoParaAtualizar.felicidade : 100;
+
+            // Aplica os efeitos e garante que o valor fique entre 0 e 100
+            alunoParaAtualizar.saude = Math.max(0, Math.min(100, saudeAtual + efeitoSaude));
+            alunoParaAtualizar.felicidade = Math.max(0, Math.min(100, felicidadeAtual + efeitoFelicidade));
+            
+            localStorage.setItem('alunos', JSON.stringify(alunos));
+
+            // Incrementar vendas do produto
+            const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+            const produtoIndex = produtos.findIndex(p => p.id === produto.id);
+            if (produtoIndex !== -1) {
+                produtos[produtoIndex].vendas = (produtos[produtoIndex].vendas || 0) + 1;
+                localStorage.setItem('produtos', JSON.stringify(produtos));
+            }
+
+            // Registrar a compra no histórico
+            const compras = JSON.parse(localStorage.getItem('compras') || '[]');
+            const novaCompra = {
+                id: Date.now().toString(),
+                alunoId: alunoParaAtualizar.id,
+                alunoNome: alunoParaAtualizar.nome,
+                produtoId: produto.id,
+                produtoNome: produto.nome,
+                valor: produto.valor,
+                data: new Date().toISOString()
+            };
+            compras.push(novaCompra);
+            localStorage.setItem('compras', JSON.stringify(compras));
+
+            showNotification(`${alunoParaAtualizar.nome} comprou "${produto.nome}"!`, 'success');
+            
+            closeModal('modalVenda');
+            renderLoja();
+            
+            // Atualizar lista de alunos se estivermos na seção de alunos
+            if (currentSection === 'alunos') {
+                filtrarAlunos();
+            }
+        }
+
+        function editarProduto(id) {
+            const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+            const produto = produtos.find(p => p.id === id);
+            
+            if (produto) {
+                currentEditingProduct = id;
+                document.getElementById('nomeProduto').value = produto.nome;
+                document.getElementById('descricaoProduto').value = produto.descricao;
+                document.getElementById('imagemProduto').value = produto.imagem || '';
+                document.getElementById('valorProduto').value = produto.valor;
+                document.getElementById('categoriaProduto').value = produto.categoria;
+                document.getElementById('efeitoSaudeProduto').value = produto.efeitoSaude || 0;
+                document.getElementById('efeitoFelicidadeProduto').value = produto.efeitoFelicidade || 0;
+                openModal('modalProduto');
+            }
+        }
+
+        function deletarProduto(id) {
+            if (confirm('Deseja realmente deletar este produto?')) {
+                const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+                const novosProdutos = produtos.filter(p => p.id !== id);
+                localStorage.setItem('produtos', JSON.stringify(novosProdutos));
+                renderLoja();
+            }
+        }
+
+        function exportarLoja() {
+            const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+            const dataStr = JSON.stringify(produtos, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'loja-produtos.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function importarLoja() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const produtosImportados = JSON.parse(e.target.result);
+                            
+                            if (!Array.isArray(produtosImportados)) {
+                                throw new Error('O arquivo não contém uma lista de produtos válida.');
+                            }
+
+                            const isValid = produtosImportados.every(p => p.nome && typeof p.valor !== 'undefined');
+                            if (!isValid) {
+                                throw new Error('Alguns produtos no arquivo importado não têm os campos necessários (nome, valor).');
+                            }
+                            
+                            if (confirm('Isso substituirá todos os itens da loja atual pelos itens do arquivo importado. Deseja continuar?')) {
+                                localStorage.setItem('produtos', JSON.stringify(produtosImportados));
+                                showNotification('Loja importada com sucesso!', 'success');
+                                renderLoja();
+                            }
+
+                        } catch (error) {
+                            showNotification(`Erro ao importar loja: ${error.message}`, 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function toggleHistoricoCompras() {
+            const historico = document.getElementById('historicoCompras');
+            const isHidden = historico.classList.contains('hidden');
+            
+            if (isHidden) {
+                renderHistoricoCompras();
+                historico.classList.remove('hidden');
+            } else {
+                historico.classList.add('hidden');
+            }
+        }
+
+        function renderHistoricoCompras() {
+            const compras = JSON.parse(localStorage.getItem('compras') || '[]');
+            const container = document.getElementById('listaCompras');
+            
+            if (compras.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhuma compra realizada ainda.</p>';
+                return;
+            }
+
+            // Ordenar por data mais recente
+            const comprasOrdenadas = compras.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left">Data/Hora</th>
+                                <th class="px-4 py-2 text-left">Aluno</th>
+                                <th class="px-4 py-2 text-left">Produto</th>
+                                <th class="px-4 py-2 text-left">Valor</th>
+                                <th class="px-4 py-2 text-left">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            ${comprasOrdenadas.map(compra => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2">
+                                        <div class="text-sm">${new Date(compra.data).toLocaleDateString('pt-BR')}</div>
+                                        <div class="text-xs text-gray-500">${new Date(compra.data).toLocaleTimeString('pt-BR')}</div>
+                                    </td>
+                                    <td class="px-4 py-2 font-medium">${compra.alunoNome}</td>
+                                    <td class="px-4 py-2">${compra.produtoNome}</td>
+                                    <td class="px-4 py-2">
+                                        <span class="font-semibold text-green-600">💰 ${compra.valor}</span>
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <button onclick="estornarCompra('${compra.id}')" class="text-red-500 hover:text-red-700 text-xs" title="Estornar compra">
+                                            <i class="fas fa-undo"></i> Estornar
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 text-sm text-gray-600">
+                    <strong>Total de compras:</strong> ${compras.length} | 
+                    <strong>Valor total:</strong> 💰 ${compras.reduce((total, compra) => total + compra.valor, 0)}
+                </div>
+            `;
+        }
+
+        function estornarCompra(compraId) {
+            if (!confirm('Deseja realmente estornar esta compra? As moedas serão devolvidas ao aluno.')) {
+                return;
+            }
+
+            const compras = JSON.parse(localStorage.getItem('compras') || '[]');
+            const compraIndex = compras.findIndex(c => c.id === compraId);
+            
+            if (compraIndex === -1) {
+                showNotification('Compra não encontrada!', 'error');
+                return;
+            }
+
+            const compra = compras[compraIndex];
+
+            // Devolver moedas ao aluno
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const alunoIndex = alunos.findIndex(a => a.id === compra.alunoId);
+            
+            if (alunoIndex !== -1) {
+                alunos[alunoIndex].moedas = (alunos[alunoIndex].moedas || 0) + compra.valor;
+                localStorage.setItem('alunos', JSON.stringify(alunos));
+            }
+
+            // Decrementar vendas do produto
+            const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+            const produtoIndex = produtos.findIndex(p => p.id === compra.produtoId);
+            if (produtoIndex !== -1 && produtos[produtoIndex].vendas > 0) {
+                produtos[produtoIndex].vendas = produtos[produtoIndex].vendas - 1;
+                localStorage.setItem('produtos', JSON.stringify(produtos));
+            }
+
+            // Remover compra do histórico
+            compras.splice(compraIndex, 1);
+            localStorage.setItem('compras', JSON.stringify(compras));
+
+            showNotification(`Compra estornada! ${compra.valor} moedas devolvidas para ${compra.alunoNome}`, 'success');
+            
+            renderHistoricoCompras();
+            renderLoja();
+            
+            // Atualizar lista de alunos se estivermos na seção de alunos
+            if (currentSection === 'alunos') {
+                filtrarAlunos();
+            }
+        }
+
+        // Funções de Relatórios
+        function renderRelatorios() {
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const container = document.getElementById('relatoriosContent');
+
+            // Top 5 Moedas
+            const topMoedas = [...alunos].sort((a, b) => (b.moedas || 0) - (a.moedas || 0)).slice(0, 5);
+
+            // Aniversariantes do mês
+            const mesAtual = new Date().getMonth();
+            const aniversariantes = alunos.filter(aluno => {
+                if (!aluno.aniversario) return false;
+                const mesAniversario = new Date(aluno.aniversario + 'T00:00:00').getMonth();
+                return mesAniversario === mesAtual;
+            });
+
+            // Frequência geral
+            const frequenciaGeral = alunos.length > 0 ? 
+                Math.round(alunos.reduce((acc, aluno) => acc + calcularFrequencia(aluno.id), 0) / alunos.length) : 0;
+
+            // Top 5 presença
+            const topPresenca = [...alunos].map(aluno => ({
+                ...aluno,
+                frequencia: calcularFrequencia(aluno.id)
+            })).sort((a, b) => b.frequencia - a.frequencia).slice(0, 5);
+
+            // 5 alunos com baixa frequência
+            const baixaFrequencia = [...alunos].map(aluno => ({
+                ...aluno,
+                frequencia: calcularFrequencia(aluno.id)
+            })).filter(aluno => aluno.frequencia < 75).sort((a, b) => a.frequencia - b.frequencia).slice(0, 5);
+
+            container.innerHTML = `
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">🏆 Top 5 Moedas</h3>
+                    <div class="space-y-2">
+                        ${topMoedas.map((aluno, index) => `
+                            <div class="flex justify-between items-center p-2 ${index === 0 ? 'bg-yellow-100' : 'bg-gray-50'} rounded">
+                                <span>${index + 1}. ${aluno.nome}</span>
+                                <span class="font-semibold">💰 ${aluno.moedas || 0}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">🎂 Aniversariantes do Mês</h3>
+                    <div class="space-y-2">
+                        ${aniversariantes.length > 0 ? aniversariantes.map(aluno => `
+                            <div class="flex justify-between items-center p-2 bg-pink-100 rounded">
+                                <span>${aluno.nome}</span>
+                                <span class="font-semibold">${new Date(aluno.aniversario + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
+                            </div>
+                        `).join('') : '<p class="text-gray-500">Nenhum aniversariante este mês</p>'}
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">📊 Frequência Geral</h3>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-blue-600">${frequenciaGeral}%</div>
+                        <p class="text-gray-600">Frequência média da turma</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">✅ Top 5 Presença</h3>
+                    <div class="space-y-2">
+                        ${topPresenca.map((aluno, index) => `
+                            <div class="flex justify-between items-center p-2 ${index === 0 ? 'bg-green-100' : 'bg-gray-50'} rounded">
+                                <span>${index + 1}. ${aluno.nome}</span>
+                                <span class="font-semibold">${aluno.frequencia}%</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">⚠️ Baixa Frequência</h3>
+                    <div class="space-y-2">
+                        ${baixaFrequencia.length > 0 ? baixaFrequencia.map(aluno => `
+                            <div class="flex justify-between items-center p-2 bg-red-100 rounded">
+                                <span class="text-red-700">${aluno.nome}</span>
+                                <span class="font-semibold text-red-700">${aluno.frequencia}%</span>
+                            </div>
+                        `).join('') : '<p class="text-gray-500">Todos os alunos com boa frequência!</p>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Funções de Ferramentas (sem alterações)
+        function sortearIndividual() {
+            const turma = document.getElementById('turmaSorteio').value;
+            if (!turma) {
+                showNotification('Selecione uma turma primeiro!', 'warning');
+                return;
+            }
+
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const alunosTurma = alunos.filter(a => a.turma === turma);
+            
+            if (alunosTurma.length === 0) {
+                showNotification('Nenhum aluno encontrado nesta turma!', 'warning');
+                return;
+            }
+
+            const eliminarSorteados = document.getElementById('eliminarSorteados').checked;
+            let alunosDisponiveis = alunosTurma;
+
+            // Se a opção de eliminar estiver ativada, filtrar os já sorteados
+            if (eliminarSorteados) {
+                alunosDisponiveis = alunosTurma.filter(a => !alunosSorteados.includes(a.id));
+                
+                if (alunosDisponiveis.length === 0) {
+                    showNotification('Todos os alunos já foram sorteados! Use o botão "Resetar Sorteios".', 'info');
+                    return;
+                }
+            }
+
+            // Iniciar animação de sorteio
+            iniciarAnimacaoSorteio(alunosDisponiveis, eliminarSorteados);
+        }
+
+        function iniciarAnimacaoSorteio(alunosDisponiveis, eliminarSorteados) {
+            const resultadoDiv = document.getElementById('resultadoSorteio');
+            
+            // Mostrar animação de carregamento
+            resultadoDiv.innerHTML = `
+                <div class="text-center p-6">
+                    <div class="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <h4 class="text-lg font-semibold text-blue-600 mb-4">🎲 Sorteando...</h4>
+                    <div id="nomesSorteando" class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 min-h-[60px] flex items-center justify-center">
+                        <span class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" id="nomeAnimado">
+                            Preparando...
+                        </span>
+                    </div>
+                    <div class="mt-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="barraProgresso" class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-100" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Animação de nomes passando rapidamente
+            let contador = 0;
+            const totalAnimacao = 30; // 3 segundos de animação
+            const nomeAnimado = document.getElementById('nomeAnimado');
+            const barraProgresso = document.getElementById('barraProgresso');
+            
+            const intervalo = setInterval(() => {
+                // Mostrar nome aleatório
+                const nomeAleatorio = alunosDisponiveis[Math.floor(Math.random() * alunosDisponiveis.length)];
+                nomeAnimado.textContent = nomeAleatorio.nome;
+                
+                // Atualizar barra de progresso
+                const progresso = (contador / totalAnimacao) * 100;
+                barraProgresso.style.width = progresso + '%';
+                
+                contador++;
+                
+                if (contador >= totalAnimacao) {
+                    clearInterval(intervalo);
+                    finalizarSorteio(alunosDisponiveis, eliminarSorteados);
+                }
+            }, 100);
+        }
+
+        function finalizarSorteio(alunosDisponiveis, eliminarSorteados) {
+            const sorteado = alunosDisponiveis[Math.floor(Math.random() * alunosDisponiveis.length)];
+            
+            // Adicionar à lista de sorteados se a eliminação estiver ativa
+            if (eliminarSorteados && !alunosSorteados.includes(sorteado.id)) {
+                alunosSorteados.push(sorteado.id);
+                atualizarListaSorteados();
+            }
+
+            const restantes = eliminarSorteados ? alunosDisponiveis.length - 1 : alunosDisponiveis.length;
+
+            // Mostrar resultado final com animação
+            document.getElementById('resultadoSorteio').innerHTML = `
+                <div class="text-center p-4">
+                    <h4 class="text-lg font-semibold text-green-600 mb-4 animate-bounce">🎯 Aluno Sorteado!</h4>
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-4 border-2 border-green-200 transform animate-pulse">
+                        <div class="text-4xl mb-2">🎉</div>
+                        <p class="text-2xl font-bold text-green-800 mb-2 animate-fadeIn">${sorteado.nome}</p>
+                        <p class="text-sm text-green-600">Turma: ${sorteado.turma}</p>
+                    </div>
+                    ${eliminarSorteados ? `<p class="text-xs text-gray-500">Restam ${restantes} alunos para sortear</p>` : ''}
+                    <div class="mt-4">
+                        <button onclick="sortearIndividual()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 text-sm rounded-lg transition-colors">
+                            🎲 Sortear Novamente
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Adicionar confetes (efeito visual)
+            criarConfetes();
+        }
+
+        function sortearEquipe() {
+            const turma = document.getElementById('turmaSorteio').value;
+            const numeroEquipes = parseInt(document.getElementById('numeroEquipes').value) || 2;
+            
+            if (!turma) {
+                showNotification('Selecione uma turma primeiro!', 'warning');
+                return;
+            }
+
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const alunosTurma = alunos.filter(a => a.turma === turma);
+
+            if (alunosTurma.length < numeroEquipes) {
+                showNotification(`Pelo menos ${numeroEquipes} alunos são necessários para formar ${numeroEquipes} equipes!`, 'warning');
+                return;
+            }
+
+            // Iniciar animação de sorteio de equipes
+            iniciarAnimacaoSorteioEquipes(alunosTurma, numeroEquipes);
+        }
+
+        function iniciarAnimacaoSorteioEquipes(alunosTurma, numeroEquipes) {
+            const resultadoDiv = document.getElementById('resultadoSorteio');
+            
+            // Mostrar animação de carregamento
+            resultadoDiv.innerHTML = `
+                <div class="text-center p-6">
+                    <div class="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <h4 class="text-lg font-semibold text-purple-600 mb-4">👥 Formando Equipes...</h4>
+                    <div id="equipesAnimacao" class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 min-h-[120px] flex flex-col items-center justify-center">
+                        <div class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2" id="statusEquipes">
+                            Embaralhando alunos...
+                        </div>
+                        <div id="nomesEquipesAnimacao" class="text-sm text-gray-600 text-center">
+                            Preparando...
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="barraProgressoEquipes" class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-100" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Animação de formação de equipes
+            let contador = 0;
+            const totalAnimacao = 35; // 3.5 segundos de animação
+            const statusEquipes = document.getElementById('statusEquipes');
+            const nomesEquipesAnimacao = document.getElementById('nomesEquipesAnimacao');
+            const barraProgressoEquipes = document.getElementById('barraProgressoEquipes');
+            
+            const fases = [
+                { min: 0, max: 10, status: 'Embaralhando alunos...', acao: () => mostrarNomesAleatorios(alunosTurma, nomesEquipesAnimacao) },
+                { min: 10, max: 20, status: 'Dividindo em grupos...', acao: () => mostrarDivisaoEquipes(numeroEquipes, nomesEquipesAnimacao) },
+                { min: 20, max: 30, status: 'Balanceando equipes...', acao: () => mostrarBalanceamento(nomesEquipesAnimacao) },
+                { min: 30, max: 35, status: 'Finalizando...', acao: () => mostrarFinalizacao(nomesEquipesAnimacao) }
+            ];
+            
+            const intervalo = setInterval(() => {
+                // Determinar fase atual
+                const faseAtual = fases.find(fase => contador >= fase.min && contador < fase.max);
+                if (faseAtual) {
+                    statusEquipes.textContent = faseAtual.status;
+                    faseAtual.acao();
+                }
+                
+                // Atualizar barra de progresso
+                const progresso = (contador / totalAnimacao) * 100;
+                barraProgressoEquipes.style.width = progresso + '%';
+                
+                contador++;
+                
+                if (contador >= totalAnimacao) {
+                    clearInterval(intervalo);
+                    finalizarSorteioEquipes(alunosTurma, numeroEquipes);
+                }
+            }, 100);
+        }
+
+        function mostrarNomesAleatorios(alunos, container) {
+            const nomesAleatorios = [];
+            for (let i = 0; i < 3; i++) {
+                const alunoAleatorio = alunos[Math.floor(Math.random() * alunos.length)];
+                nomesAleatorios.push(alunoAleatorio.nome);
+            }
+            container.innerHTML = nomesAleatorios.join(' • ');
+        }
+
+        function mostrarDivisaoEquipes(numeroEquipes, container) {
+            const emojis = ['🔵', '🔴', '🟢', '🟡', '🟣', '🩷', '🔵', '🟠', '🔷', '💎'];
+            const equipesVisiveis = [];
+            for (let i = 0; i < numeroEquipes; i++) {
+                equipesVisiveis.push(`${emojis[i]} Equipe ${i + 1}`);
+            }
+            container.innerHTML = equipesVisiveis.join(' | ');
+        }
+
+        function mostrarBalanceamento(container) {
+            const balanceamentos = [
+                'Ajustando tamanhos...',
+                'Distribuindo membros...',
+                'Equilibrando forças...',
+                'Organizando grupos...'
+            ];
+            const textoAleatorio = balanceamentos[Math.floor(Math.random() * balanceamentos.length)];
+            container.innerHTML = textoAleatorio;
+        }
+
+        function mostrarFinalizacao(container) {
+            container.innerHTML = '✨ Equipes prontas! ✨';
+        }
+
+        function finalizarSorteioEquipes(alunosTurma, numeroEquipes) {
+            // Embaralhar alunos
+            const embaralhados = [...alunosTurma].sort(() => Math.random() - 0.5);
+            
+            // Dividir em equipes
+            const equipes = [];
+            const tamanhoBase = Math.floor(embaralhados.length / numeroEquipes);
+            const resto = embaralhados.length % numeroEquipes;
+            
+            let indiceAtual = 0;
+            for (let i = 0; i < numeroEquipes; i++) {
+                const tamanhoEquipe = tamanhoBase + (i < resto ? 1 : 0);
+                equipes.push(embaralhados.slice(indiceAtual, indiceAtual + tamanhoEquipe));
+                indiceAtual += tamanhoEquipe;
+            }
+
+            // Cores para as equipes
+            const coresEquipes = [
+                { bg: 'bg-blue-100', text: 'text-blue-700', emoji: '🔵', border: 'border-blue-300' },
+                { bg: 'bg-red-100', text: 'text-red-700', emoji: '🔴', border: 'border-red-300' },
+                { bg: 'bg-green-100', text: 'text-green-700', emoji: '🟢', border: 'border-green-300' },
+                { bg: 'bg-yellow-100', text: 'text-yellow-700', emoji: '🟡', border: 'border-yellow-300' },
+                { bg: 'bg-purple-100', text: 'text-purple-700', emoji: '🟣', border: 'border-purple-300' },
+                { bg: 'bg-pink-100', text: 'text-pink-700', emoji: '🩷', border: 'border-pink-300' },
+                { bg: 'bg-indigo-100', text: 'text-indigo-700', emoji: '🔵', border: 'border-indigo-300' },
+                { bg: 'bg-orange-100', text: 'text-orange-700', emoji: '🟠', border: 'border-orange-300' },
+                { bg: 'bg-teal-100', text: 'text-teal-700', emoji: '🔷', border: 'border-teal-300' },
+                { bg: 'bg-cyan-100', text: 'text-cyan-700', emoji: '💎', border: 'border-cyan-300' }
+            ];
+
+            const equipesHtml = equipes.map((equipe, index) => {
+                const cor = coresEquipes[index % coresEquipes.length];
+                return `
+                    <div class="${cor.bg} ${cor.border} p-4 rounded-xl border-2 transform animate-slideInUp shadow-lg hover:shadow-xl transition-all duration-300" style="animation-delay: ${index * 0.1}s">
+                        <h4 class="font-bold ${cor.text} mb-3 text-center text-base">
+                            ${cor.emoji} Equipe ${index + 1}
+                        </h4>
+                        <div class="text-center mb-2">
+                            <span class="text-xs ${cor.text} bg-white px-2 py-1 rounded-full font-medium">
+                                ${equipe.length} membros
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            ${equipe.map((aluno, alunoIndex) => `
+                                <div class="bg-white bg-opacity-70 px-3 py-2 rounded-lg text-sm font-medium text-gray-800 transform animate-fadeIn" style="animation-delay: ${(index * 0.1) + (alunoIndex * 0.05)}s">
+                                    ${aluno.nome}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('resultadoSorteio').innerHTML = `
+                <div class="p-4">
+                    <h4 class="text-center font-bold text-purple-600 mb-6 text-lg animate-bounce">
+                        🎉 Equipes Formadas com Sucesso! 🎉
+                    </h4>
+                    <div class="grid grid-cols-1 ${numeroEquipes <= 2 ? 'sm:grid-cols-2' : numeroEquipes <= 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 lg:grid-cols-3'} gap-4">
+                        ${equipesHtml}
+                    </div>
+                    <div class="text-center mt-6">
+                        <button onclick="sortearEquipe()" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 text-sm rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            🔄 Sortear Novamente
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Adicionar confetes para celebrar
+            criarConfetes();
+        }
+
+        function resetarSorteios() {
+            alunosSorteados = [];
+            document.getElementById('resultadoSorteio').innerHTML = '<div class="flex items-center justify-center text-gray-500 text-sm">Selecione uma turma e clique em sortear</div>';
+            document.getElementById('listaSorteados').classList.add('hidden');
+            showNotification('Lista de sorteios resetada!', 'info');
+        }
+
+        function atualizarListaSorteados() {
+            const listaSorteadosDiv = document.getElementById('listaSorteados');
+            const nomesSorteadosDiv = document.getElementById('nomesSorteados');
+            
+            if (alunosSorteados.length === 0) {
+                listaSorteadosDiv.classList.add('hidden');
+                return;
+            }
+
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            const nomesSorteadosArray = alunosSorteados.map(id => {
+                const aluno = alunos.find(a => a.id === id);
+                return aluno ? aluno.nome : 'Aluno não encontrado';
+            });
+
+            nomesSorteadosDiv.innerHTML = nomesSorteadosArray.join(', ');
+            listaSorteadosDiv.classList.remove('hidden');
+        }
+
+        function aplicarRecompensas() {
+            const turma = document.getElementById('turmaRecompensa').value;
+            const moedas = parseInt(document.getElementById('valorMoedas').value) || 0;
+            const estrelas = parseInt(document.getElementById('valorEstrelas').value) || 0;
+
+            if (!turma) {
+                showNotification('Selecione uma turma primeiro!', 'warning');
+                return;
+            }
+
+            if (moedas === 0 && estrelas === 0) {
+                showNotification('Digite um valor para moedas ou estrelas!', 'warning');
+                return;
+            }
+
+            const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+            let alunosAfetados = 0;
+
+            alunos.forEach(aluno => {
+                if (aluno.turma === turma && aluno.presente) {
+                    aluno.moedas = (aluno.moedas || 0) + moedas;
+                    aluno.estrelas = (aluno.estrelas || 0) + estrelas;
+                    alunosAfetados++;
+                }
+            });
+
+            localStorage.setItem('alunos', JSON.stringify(alunos));
+            showNotification(`Recompensas aplicadas para ${alunosAfetados} alunos presentes!`, 'success');
+            
+            // Limpar campos
+            document.getElementById('valorMoedas').value = '';
+            document.getElementById('valorEstrelas').value = '';
+        }
+
+        function criarConfetes() {
+            const cores = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8'];
+            const container = document.body;
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confete = document.createElement('div');
+                    confete.style.position = 'fixed';
+                    confete.style.left = Math.random() * 100 + 'vw';
+                    confete.style.top = '-10px';
+                    confete.style.width = '10px';
+                    confete.style.height = '10px';
+                    confete.style.backgroundColor = cores[Math.floor(Math.random() * cores.length)];
+                    confete.style.borderRadius = '50%';
+                    confete.style.pointerEvents = 'none';
+                    confete.style.zIndex = '9999';
+                    confete.style.animation = `confeteFall ${2 + Math.random() * 3}s linear forwards`;
+                    
+                    container.appendChild(confete);
+                    
+                    setTimeout(() => {
+                        if (confete.parentNode) {
+                            confete.parentNode.removeChild(confete);
+                        }
+                    }, 5000);
+                }, i * 50);
+            }
+        }
+
+        async function buscarFrase() {
+            const fraseDiaDiv = document.getElementById('fraseDia');
+            
+            fraseDiaDiv.innerHTML = `
+                <div class="flex items-center justify-center space-x-2">
+                    <div class="animate-spin w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full"></div>
+                    <span class="text-gray-500">Buscando frase inspiradora...</span>
+                </div>
+            `;
+
+            const frases = [
+                { frase: "O sucesso é a soma de pequenos esforços repetidos dia após dia.", autor: "Robert Collier" },
+                { frase: "A educação é a arma mais poderosa que você pode usar para mudar o mundo.", autor: "Nelson Mandela" },
+                { frase: "A criatividade é a inteligência se divertindo.", autor: "Albert Einstein" },
+                { frase: "A única forma de fazer um excelente trabalho é amar o que você faz.", autor: "Steve Jobs" }
+            ];
+
+            const fraseAleatoria = frases[Math.floor(Math.random() * frases.length)];
+            fraseDiaDiv.innerHTML = `
+                <div class="text-center">
+                    <p class="text-lg italic text-gray-700 mb-2">"${fraseAleatoria.frase}"</p>
+                    <p class="text-sm text-gray-500">— ${fraseAleatoria.autor}</p>
+                </div>
+            `;
+        }
+
+        // Funções de Import/Export
+        function exportData() {
+            const dados = {
+                alunos: JSON.parse(localStorage.getItem('alunos') || '[]'),
+                missoes: JSON.parse(localStorage.getItem('missoes') || '[]'),
+                produtos: JSON.parse(localStorage.getItem('produtos') || '[]'),
+                chamadas: JSON.parse(localStorage.getItem('chamadas') || '[]'),
+                compras: JSON.parse(localStorage.getItem('compras') || '[]')
+            };
+
+            const dataStr = JSON.stringify(dados, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            
+            const hoje = new Date();
+            const dataFormatada = `${hoje.getDate().toString().padStart(2, '0')}-${(hoje.getMonth() + 1).toString().padStart(2, '0')}-${hoje.getFullYear()}`;
+            link.download = `backup-gestao-maker-${dataFormatada}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const dados = JSON.parse(e.target.result);
+                            
+                            if (dados.alunos) localStorage.setItem('alunos', JSON.stringify(dados.alunos));
+                            if (dados.missoes) localStorage.setItem('missoes', JSON.stringify(dados.missoes));
+                            if (dados.produtos) localStorage.setItem('produtos', JSON.stringify(dados.produtos));
+                            if (dados.chamadas) localStorage.setItem('chamadas', JSON.stringify(dados.chamadas));
+                            if (dados.compras) localStorage.setItem('compras', JSON.stringify(dados.compras));
+                            
+                            showNotification('Dados importados com sucesso!', 'success');
+                            location.reload();
+                        } catch (error) {
+                            showNotification('Erro ao importar dados. Verifique se o arquivo está correto.', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+    </script>
+</body>
+</html>
+
