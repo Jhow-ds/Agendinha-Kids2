@@ -453,15 +453,15 @@
                 <i class="fas fa-tools"></i>
                 <span>Ferramentas</span>
             </button>
-            <button class="mobile-nav-item" onclick="showSection('cadastroMassa')">
+            <button class="mobile-nav-item modo-professor" onclick="showSection('cadastroMassa')">
                 <i class="fas fa-users-cog"></i>
                 <span>Cadastro em Massa</span>
             </button>
-            <button class="mobile-nav-item" onclick="importData()">
+            <button class="mobile-nav-item modo-professor" onclick="importData()">
                 <i class="fas fa-file-import"></i>
                 <span>Importar Dados</span>
             </button>
-            <button class="mobile-nav-item" onclick="exportData()">
+            <button class="mobile-nav-item modo-professor" onclick="exportData()">
                 <i class="fas fa-file-export"></i>
                 <span>Exportar Dados</span>
             </button>
@@ -498,13 +498,13 @@
             <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="showSection('ferramentas')">
                 <i class="fas fa-tools"></i><span>Ferramentas</span>
             </div>
-            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="showSection('cadastroMassa')">
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3 modo-professor" onclick="showSection('cadastroMassa')">
                 <i class="fas fa-users-cog"></i><span>Cadastro em Massa</span>
             </div>
-            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="importData()">
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3 modo-professor" onclick="importData()">
                 <i class="fas fa-file-import"></i><span>Importar Dados</span>
             </div>
-            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3" onclick="exportData()">
+            <div class="sidebar-item px-6 py-3 cursor-pointer flex items-center space-x-3 modo-professor" onclick="exportData()">
                 <i class="fas fa-file-export"></i><span>Exportar Dados</span>
             </div>
         </nav>
@@ -513,10 +513,10 @@
     <!-- Notification Container -->
     <div id="notificationContainer"></div>
 
-    <!-- "Passando o Mês" Animation Overlay -->
+    <!-- "Passando o Mês/Semana" Animation Overlay -->
     <div id="mesOverlay" class="fixed inset-0 bg-black bg-opacity-0 flex-col items-center justify-center z-[1500] hidden pointer-events-none">
         <div id="mesSpinner" class="animate-spin w-16 h-16 border-4 border-white border-t-transparent rounded-full mb-4"></div>
-        <p id="mesTexto" class="text-white text-2xl font-bold">Passando o mês...</p>
+        <p id="mesTexto" class="text-white text-2xl font-bold"></p>
     </div>
 
     <!-- Main Content -->
@@ -526,16 +526,20 @@
             <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-6 mb-4 lg:mb-6">
                 <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 mb-4 lg:mb-6">
                     <h2 class="text-xl sm:text-2xl font-bold text-gray-800">👥 Gerenciar Alunos</h2>
-                    <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 lg:space-x-4">
-                        <select id="filtroTurma" class="px-3 py-2 text-sm border rounded-lg" onchange="filtrarAlunos()">
-                            <option value="">Todas as Turmas</option>
-                        </select>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="filtroTurma" class="px-3 py-2 text-sm border rounded-lg" onchange="filtrarAlunos()"><option value="">Todas as Turmas</option></select>
                         <input type="text" id="pesquisarAluno" placeholder="Pesquisar aluno..." class="px-3 py-2 text-sm border rounded-lg" oninput="filtrarAlunos()">
+                        <button onclick="openModal('modalProximaSemana')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                            <i class="fas fa-calendar-week"></i> <span class="hidden sm:inline">Próxima Semana</span>
+                        </button>
                         <button onclick="openModal('modalProximoMes')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 text-sm rounded-lg transition-colors">
                             <i class="fas fa-calendar-alt"></i> <span class="hidden sm:inline">Próximo Mês</span>
                         </button>
-                        <button onclick="openModal('modalCadastroAluno')" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                        <button onclick="openModal('modalCadastroAluno')" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 text-sm rounded-lg transition-colors modo-professor">
                             <i class="fas fa-plus"></i> <span class="hidden sm:inline">Novo Aluno</span>
+                        </button>
+                        <button id="professorModeBtn" onclick="toggleProfessorMode()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                            <i id="lockIcon" class="fas fa-lock"></i> <span class="hidden sm:inline">Professor</span>
                         </button>
                     </div>
                 </div>
@@ -567,7 +571,7 @@
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-2xl font-bold text-gray-800">🏆 Missões</h2>
-                    <button onclick="openModal('modalMissao')" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg transition-colors">
+                    <button onclick="openModal('modalMissao')" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg transition-colors modo-professor">
                         <i class="fas fa-plus"></i> Nova Missão
                     </button>
                 </div>
@@ -593,13 +597,13 @@
                         <button onclick="toggleHistoricoCompras()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0">
                             <i class="fas fa-history"></i> Histórico
                         </button>
-                        <button onclick="openModal('modalProduto')" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0">
+                        <button onclick="openModal('modalProduto')" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0 modo-professor">
                             <i class="fas fa-plus"></i> Novo Item
                         </button>
-                        <button onclick="exportarLoja()" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0">
+                        <button onclick="exportarLoja()" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0 modo-professor">
                             <i class="fas fa-download"></i> Exportar
                         </button>
-                        <button onclick="importarLoja()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0">
+                        <button onclick="importarLoja()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors text-sm flex-grow sm:flex-grow-0 modo-professor">
                             <i class="fas fa-upload"></i> Importar
                         </button>
                     </div>
@@ -641,7 +645,7 @@
                         <ul class="space-y-2 text-sm text-gray-700">
                             <li>• Digite um nome por linha</li>
                             <li>• Selecione a turma antes de cadastrar</li>
-                            <li>• Os alunos serão criados com valores padrão (0 moedas, 0 estrelas)</li>
+                            <li>• Os alunos serão criados com valores padrão (0 moedas, 0 saúde, 0 felicidade)</li>
                             <li>• Avatares serão atribuídos automaticamente</li>
                             <li>• Use o botão "Exportar Dados" na barra lateral para backup completo</li>
                         </ul>
@@ -710,7 +714,7 @@
                     </div>
                     
                     <!-- Aplicar Recompensas -->
-                    <div class="bg-gray-50 p-4 lg:p-6 rounded-lg">
+                    <div class="bg-gray-50 p-4 lg:p-6 rounded-lg modo-professor-container">
                         <h3 class="text-lg font-semibold mb-4">💰 Aplicar/Retirar em Massa</h3>
                         <div class="space-y-4">
                             <select id="turmaRecompensa" class="w-full px-3 py-2 text-sm border rounded-lg">
@@ -724,7 +728,7 @@
                             <button onclick="aplicarEmMassa()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 text-sm rounded-lg transition-colors">
                                 <i class="fas fa-plus-circle"></i> Aplicar aos Presentes
                             </button>
-                            <button onclick="retirarEmMassa()" class="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 text-sm rounded-lg transition-colors">
+                             <button onclick="retirarEmMassa()" class="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 text-sm rounded-lg transition-colors mt-2">
                                 <i class="fas fa-minus-circle"></i> Retirar dos Presentes
                             </button>
                         </div>
@@ -768,6 +772,7 @@
             <div class="space-y-4">
                 <input type="text" id="editNomeAluno" placeholder="Nome do aluno" class="w-full px-4 py-2 border rounded-lg">
                 <input type="date" id="editAniversarioAluno" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="editSalarioAluno" placeholder="Salário Mensal" class="w-full px-4 py-2 border rounded-lg">
                 <input type="number" id="editMoedasAluno" placeholder="Moedas" class="w-full px-4 py-2 border rounded-lg">
                 <input type="number" id="editSaudeAluno" placeholder="Saúde" class="w-full px-4 py-2 border rounded-lg">
                 <input type="number" id="editFelicidadeAluno" placeholder="Felicidade" class="w-full px-4 py-2 border rounded-lg">
@@ -779,13 +784,32 @@
         </div>
     </div>
 
+    <!-- Modal Próxima Semana -->
+    <div id="modalProximaSemana" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
+        <div class="modal-content bg-white rounded-lg p-4 sm:p-6">
+            <h3 class="text-lg font-semibold mb-4">🗓️ Próxima Semana</h3>
+            <div class="space-y-4">
+                <p class="text-sm text-gray-600">Insira valores para deduzir de todos os alunos presentes. Isso simula despesas semanais simples.</p>
+                <input type="number" id="despesasSemanaMoedas" placeholder="Despesa de Moedas (-)" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="despesasSemanaSaude" placeholder="Despesa de Saúde (-)" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="despesasSemanaFelicidade" placeholder="Despesa de Felicidade (-)" class="w-full px-4 py-2 border rounded-lg">
+                <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                    <button onclick="proximaSemana()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Confirmar</button>
+                    <button onclick="closeModal('modalProximaSemana')" class="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Modal Próximo Mês -->
     <div id="modalProximoMes" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
         <div class="modal-content bg-white rounded-lg p-4 sm:p-6">
             <h3 class="text-lg font-semibold mb-4">🗓️ Próximo Mês</h3>
             <div class="space-y-4">
-                <p class="text-sm text-gray-600">Insira um valor para deduzir das moedas de todos os alunos presentes. Isso simula despesas mensais.</p>
-                <input type="number" id="despesasMensais" placeholder="Valor das Despesas" class="w-full px-4 py-2 border rounded-lg">
+                <p class="text-sm text-gray-600">Insira as despesas gerais do mês. Os salários e os efeitos (bônus/penalidades) dos itens no inventário dos alunos também serão aplicados.</p>
+                <input type="number" id="despesasMesMoedas" placeholder="Despesa de Moedas (-)" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="despesasMesSaude" placeholder="Despesa de Saúde (-)" class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" id="despesasMesFelicidade" placeholder="Despesa de Felicidade (-)" class="w-full px-4 py-2 border rounded-lg">
                 <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
                     <button onclick="proximoMes()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Confirmar</button>
                     <button onclick="closeModal('modalProximoMes')" class="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Cancelar</button>
@@ -793,6 +817,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Modal Missão -->
     <div id="modalMissao" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
@@ -830,8 +855,20 @@
                 <input type="url" id="imagemProduto" placeholder="URL da imagem" class="w-full px-4 py-2 border rounded-lg">
                 <input type="number" id="valorProduto" placeholder="Valor (moedas)" class="w-full px-4 py-2 border rounded-lg">
                 <input type="text" id="categoriaProduto" placeholder="Categoria" class="w-full px-4 py-2 border rounded-lg">
-                <input type="number" id="efeitoSaudeProduto" placeholder="Efeito na Saúde (+/-)" class="w-full px-4 py-2 border rounded-lg">
-                <input type="number" id="efeitoFelicidadeProduto" placeholder="Efeito na Felicidade (+/-)" class="w-full px-4 py-2 border rounded-lg">
+                
+                <div class="pt-2 mt-2 border-t">
+                     <p class="text-sm font-medium text-gray-500 mb-2 text-center">Efeitos Imediatos na Compra</p>
+                    <input type="number" id="efeitoSaudeProduto" placeholder="Efeito na Saúde (+/-)" class="w-full px-4 py-2 border rounded-lg mb-2">
+                    <input type="number" id="efeitoFelicidadeProduto" placeholder="Efeito na Felicidade (+/-)" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+
+                <div class="pt-2 mt-2 border-t">
+                    <p class="text-sm font-medium text-gray-500 mb-2 text-center">Efeitos Mensais (Bônus/Despesa)</p>
+                    <input type="number" id="bonusMoedasProduto" placeholder="Bônus Mensal de Moedas (+/-)" class="w-full px-4 py-2 border rounded-lg mb-2">
+                    <input type="number" id="despesaMoedasProduto" placeholder="Despesa Mensal de Moedas (-)" class="w-full px-4 py-2 border rounded-lg mb-2">
+                    <input type="number" id="bonusSaudeProduto" placeholder="Bônus Mensal de Saúde (+/-)" class="w-full px-4 py-2 border rounded-lg mb-2">
+                    <input type="number" id="bonusFelicidadeProduto" placeholder="Bônus Mensal de Felicidade (+/-)" class="w-full px-4 py-2 border rounded-lg">
+                </div>
                 <div class="flex space-x-2">
                     <button onclick="salvarProduto()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex-1">Salvar</button>
                     <button onclick="closeModal('modalProduto')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex-1">Cancelar</button>
@@ -870,6 +907,22 @@
     <div id="modalImagem" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center z-[1200]" onclick="closeModal('modalImagem')">
         <img id="imagemAmpliada" src="" class="max-w-[90vw] max-h-[90vh] rounded-lg shadow-2xl" alt="Imagem Ampliada">
     </div>
+    
+    <!-- Modal Senha Professor -->
+    <div id="modalSenhaProfessor" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-[2000] p-4">
+        <div class="modal-content bg-white rounded-lg p-4 sm:p-6">
+            <h3 class="text-lg font-semibold mb-4">🔐 Acesso Restrito</h3>
+            <div class="space-y-4">
+                <p class="text-sm text-gray-600">Digite a senha de administrador para ativar/desativar o Modo Professor.</p>
+                <input type="password" id="senhaProfessor" placeholder="Senha" class="w-full px-4 py-2 border rounded-lg">
+                <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                    <button onclick="verificarSenhaProfessor()" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Confirmar</button>
+                    <button onclick="closeModal('modalSenhaProfessor')" class="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex-1 transition-colors text-sm">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // Dados globais
@@ -878,6 +931,7 @@
         let currentEditingMission = null;
         let currentEditingProduct = null;
         let alunosSorteados = [];
+        let isProfessorMode = false;
 
         // Sistema de notificações
         function showNotification(message, type = 'success') {
@@ -954,6 +1008,8 @@
             if (!localStorage.getItem('compras')) {
                 localStorage.setItem('compras', JSON.stringify([]));
             }
+            isProfessorMode = sessionStorage.getItem('professorMode') === 'true';
+            atualizarVisibilidadeProfessor();
         }
 
         function populateSelects() {
@@ -961,10 +1017,9 @@
             selects.forEach(selectId => {
                 const select = document.getElementById(selectId);
                 if (select) {
-                    // Limpar opções existentes (exceto a primeira)
-                    while (select.children.length > 1) {
-                        select.removeChild(select.lastChild);
-                    }
+                    const firstOptionHTML = select.options.length > 0 ? select.options[0].outerHTML : '<option value="">Selecione...</option>';
+                    select.innerHTML = firstOptionHTML; // Reinicia o select com a primeira opção
+
                     turmas.forEach(turma => {
                         const option = document.createElement('option');
                         option.value = turma;
@@ -1168,6 +1223,7 @@
                 case 'ferramentas':
                     break;
             }
+            atualizarVisibilidadeProfessor();
         }
 
         // Funções de Cadastro em Massa
@@ -1205,9 +1261,10 @@
                             turma,
                             aniversario: '',
                             moedas: 0,
-                            estrelas: 0,
+                            salario: 0,
                             saude: 0,
                             felicidade: 0,
+                            inventario: [],
                             presente: false,
                             avatar: gerarAvatarPorNome(nomeFormatado)
                         };
@@ -1284,7 +1341,7 @@
             const isAniversariante = ehAniversariante(aluno.aniversario);
             const frequencia = calcularFrequencia(aluno.id);
             const dataAniversario = aluno.aniversario ? new Date(aluno.aniversario + 'T00:00:00').toLocaleDateString('pt-BR') : '';
-            const nomeFormatado = formatarNome(aluno.nome);
+            const nomeFormatado = aluno.nome;
 
             let cardBorderClass = 'border-slate-200';
             let cardBgClass = 'bg-white';
@@ -1305,8 +1362,8 @@
                 ${isAniversariante ? '<div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-yellow-400 to-amber-500 rounded-bl-full flex items-start justify-end p-2"><span class="text-white text-xs">🎂</span></div>' : ''}
                 
                 <div> <!-- Container for top part -->
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center space-x-4 min-w-0">
+                    <div class="relative mb-4">
+                        <div class="flex items-start space-x-4">
                             <div class="relative flex-shrink-0">
                                 <div class="w-20 h-20 rounded-2xl overflow-hidden border-3 ${isAniversariante ? 'border-yellow-400' : 'border-slate-200'} shadow-lg bg-gradient-to-br from-slate-100 to-slate-200">
                                     <img src="${aluno.avatar || gerarAvatarPorNome(aluno.nome)}" 
@@ -1328,8 +1385,7 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 ml-2">
+                        <div class="absolute top-0 right-0 flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 modo-professor">
                             <button onclick="regenerarAvatar('${aluno.id}')" class="p-2 text-purple-500 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-colors" title="Regenerar Avatar">
                                 <i class="fas fa-sync-alt text-sm"></i>
                             </button>
@@ -1357,6 +1413,10 @@
                                 <span class="font-bold text-slate-800">${aluno.felicidade || 0}</span>
                             </div>
                         </div>
+                    </div>
+                     <div class="mt-2 text-sm text-slate-600">
+                        <span>Salário:</span>
+                        <span class="font-bold text-slate-800">💰 ${aluno.salario || 0} / mês</span>
                     </div>
                 </div>
 
@@ -1391,9 +1451,10 @@
                 turma,
                 aniversario,
                 moedas: 0,
-                estrelas: 0,
+                salario: 0,
                 saude: 0,
                 felicidade: 0,
+                inventario: [],
                 presente: false,
                 avatar: gerarAvatarPorNome(nome)
             };
@@ -1414,6 +1475,7 @@
                 document.getElementById('editNomeAluno').value = aluno.nome;
                 document.getElementById('editAniversarioAluno').value = aluno.aniversario || '';
                 document.getElementById('editMoedasAluno').value = aluno.moedas || 0;
+                document.getElementById('editSalarioAluno').value = aluno.salario || 0;
                 document.getElementById('editSaudeAluno').value = aluno.saude || 0;
                 document.getElementById('editFelicidadeAluno').value = aluno.felicidade || 0;
                 openModal('modalEditarAluno');
@@ -1430,8 +1492,9 @@
                 alunos[index].nome = document.getElementById('editNomeAluno').value;
                 alunos[index].aniversario = document.getElementById('editAniversarioAluno').value;
                 alunos[index].moedas = parseInt(document.getElementById('editMoedasAluno').value) || 0;
-                alunos[index].saude = parseInt(document.getElementById('editSaudeAluno').value) || 100;
-                alunos[index].felicidade = parseInt(document.getElementById('editFelicidadeAluno').value) || 100;
+                alunos[index].salario = parseInt(document.getElementById('editSalarioAluno').value) || 0;
+                alunos[index].saude = parseInt(document.getElementById('editSaudeAluno').value) || 0;
+                alunos[index].felicidade = parseInt(document.getElementById('editFelicidadeAluno').value) || 0;
                 
                 localStorage.setItem('alunos', JSON.stringify(alunos));
                 closeModal('modalEditarAluno');
@@ -1486,6 +1549,7 @@
                 return;
             }
             container.innerHTML = alunosFiltrados.map(aluno => cardAlunoTemplate(aluno)).join('');
+            atualizarVisibilidadeProfessor();
         }
 
         function getFrequenciaColor(frequencia) {
@@ -1515,19 +1579,22 @@
             return Math.round((presencas.length / chamadasDoAluno.length) * 100);
         }
         
-        // Funções de "Próximo Mês"
-        function proximoMes() {
-            const despesas = parseInt(document.getElementById('despesasMensais').value);
+        // Funções de "Próxima Semana" e "Próximo Mês"
+        function proximaSemana() {
+            const despesasMoedas = parseInt(document.getElementById('despesasSemanaMoedas').value) || 0;
+            const despesasSaude = parseInt(document.getElementById('despesasSemanaSaude').value) || 0;
+            const despesasFelicidade = parseInt(document.getElementById('despesasSemanaFelicidade').value) || 0;
             const turmaFiltro = document.getElementById('filtroTurma').value;
 
-            if (isNaN(despesas) || despesas < 0) {
-                showNotification('Por favor, insira um valor de despesa válido.', 'warning');
+            if (despesasMoedas < 0 || despesasSaude < 0 || despesasFelicidade < 0) {
+                showNotification('Valores de despesa devem ser positivos.', 'warning');
                 return;
             }
 
-            closeModal('modalProximoMes');
+            closeModal('modalProximaSemana');
             
             const overlay = document.getElementById('mesOverlay');
+            overlay.querySelector('#mesTexto').textContent = 'Passando a semana...';
             overlay.style.display = 'flex';
 
             setTimeout(() => {
@@ -1537,16 +1604,87 @@
             setTimeout(() => {
                 const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
                 let alunosAfetados = 0;
+
                 alunos.forEach(aluno => {
                     const matchTurma = !turmaFiltro || aluno.turma === turmaFiltro;
                     if (aluno.presente && matchTurma) {
-                        aluno.moedas = Math.max(0, (aluno.moedas || 0) - despesas);
+                        aluno.moedas = Math.max(0, (aluno.moedas || 0) - despesasMoedas);
+                        aluno.saude = Math.max(0, (aluno.saude || 0) - despesasSaude);
+                        aluno.felicidade = Math.max(0, (aluno.felicidade || 0) - despesasFelicidade);
                         alunosAfetados++;
                     }
                 });
                 localStorage.setItem('alunos', JSON.stringify(alunos));
                 
-                showNotification(`${alunosAfetados} alunos da turma ${turmaFiltro || 'selecionada'} tiveram ${despesas} moedas deduzidas.`, 'info');
+                showNotification(`${alunosAfetados} alunos da turma ${turmaFiltro || 'selecionada'} tiveram suas despesas semanais aplicadas.`, 'info');
+
+                setTimeout(() => {
+                    filtrarAlunos();
+                    overlay.style.backgroundColor = 'rgba(0,0,0,0)';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 500);
+                }, 1000);
+
+            }, 1000);
+        }
+
+        function proximoMes() {
+            const despesasMoedas = parseInt(document.getElementById('despesasMesMoedas').value) || 0;
+            const despesasSaude = parseInt(document.getElementById('despesasMesSaude').value) || 0;
+            const despesasFelicidade = parseInt(document.getElementById('despesasMesFelicidade').value) || 0;
+            const turmaFiltro = document.getElementById('filtroTurma').value;
+
+            if (despesasMoedas < 0 || despesasSaude < 0 || despesasFelicidade < 0) {
+                showNotification('Valores de despesa devem ser positivos.', 'warning');
+                return;
+            }
+
+            closeModal('modalProximoMes');
+            
+            const overlay = document.getElementById('mesOverlay');
+            overlay.querySelector('#mesTexto').textContent = 'Passando o mês...';
+            overlay.style.display = 'flex';
+
+            setTimeout(() => {
+                overlay.style.backgroundColor = 'rgba(0,0,0,0.75)';
+            }, 10);
+
+            setTimeout(() => {
+                const alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+                const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+                let alunosAfetados = 0;
+
+                alunos.forEach(aluno => {
+                    const matchTurma = !turmaFiltro || aluno.turma === turmaFiltro;
+                    if (aluno.presente && matchTurma) {
+                        // 1. Aplicar salário
+                        aluno.moedas = (aluno.moedas || 0) + (aluno.salario || 0);
+
+                        // 2. Aplicar despesas gerais
+                        aluno.moedas = Math.max(0, (aluno.moedas || 0) - despesasMoedas);
+                        aluno.saude = Math.max(0, (aluno.saude || 0) - despesasSaude);
+                        aluno.felicidade = Math.max(0, (aluno.felicidade || 0) - despesasFelicidade);
+                        
+                        // 3. Aplicar bônus/penalidades dos itens do inventário
+                        if (aluno.inventario && aluno.inventario.length > 0) {
+                            aluno.inventario.forEach(produtoId => {
+                                const item = produtos.find(p => p.id === produtoId);
+                                if (item) {
+                                    aluno.moedas = Math.max(0, (aluno.moedas || 0) + (item.bonusMensalMoedas || 0));
+                                    aluno.moedas = Math.max(0, (aluno.moedas || 0) - (item.despesaMensal || 0));
+                                    aluno.saude = Math.max(0, Math.min(100, (aluno.saude || 0) + (item.bonusMensalSaude || 0)));
+                                    aluno.felicidade = Math.max(0, Math.min(100, (aluno.felicidade || 0) + (item.bonusMensalFelicidade || 0)));
+                                }
+                            });
+                        }
+
+                        alunosAfetados++;
+                    }
+                });
+                localStorage.setItem('alunos', JSON.stringify(alunos));
+                
+                showNotification(`${alunosAfetados} alunos da turma ${turmaFiltro || 'selecionada'} tiveram seus status mensais atualizados.`, 'info');
 
                 setTimeout(() => {
                     filtrarAlunos();
@@ -1662,7 +1800,7 @@
                                     (${chamada.total > 0 ? Math.round((chamada.presentes.length / chamada.total) * 100) : 0}%)
                                 </div>
                             </div>
-                            <div class="flex space-x-2">
+                            <div class="flex space-x-2 modo-professor">
                                 <button onclick="editarChamada('${chamada.id}')" class="text-blue-500 hover:text-blue-700" title="Editar chamada">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -1674,6 +1812,7 @@
                     `).join('')}
                 </div>
             `;
+            atualizarVisibilidadeProfessor();
         }
 
         function editarChamada(id) {
@@ -1733,7 +1872,7 @@
             }
         }
 
-        // Funções de Missões (sem alterações)
+        // Funções de Missões
         function renderMissoes() {
             const missoes = JSON.parse(localStorage.getItem('missoes') || '[]');
             const container = document.getElementById('listaMissoes');
@@ -1742,7 +1881,7 @@
                 <div class="bg-white rounded-lg shadow-md p-6 border-l-4 ${getDificuldadeCor(missao.dificuldade)}">
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="text-lg font-semibold text-gray-800">${missao.titulo}</h3>
-                        <div class="flex space-x-2">
+                        <div class="flex space-x-2 modo-professor">
                             <button onclick="editarMissao('${missao.id}')" class="text-blue-500 hover:text-blue-700">
                                 <i class="fas fa-edit"></i>
                             </button>
@@ -1759,6 +1898,7 @@
                     </div>
                 </div>
             `).join('');
+            atualizarVisibilidadeProfessor();
         }
 
         function getDificuldadeCor(dificuldade) {
@@ -1859,6 +1999,12 @@
             container.innerHTML = produtosFiltrados.map(produto => {
                 const efeitoSaude = produto.efeitoSaude || 0;
                 const efeitoFelicidade = produto.efeitoFelicidade || 0;
+                const bonusMoedas = produto.bonusMensalMoedas || 0;
+                const despesaMoedas = produto.despesaMensal || 0;
+                const bonusSaude = produto.bonusMensalSaude || 0;
+                const bonusFelicidade = produto.bonusMensalFelicidade || 0;
+                const hasBonus = bonusMoedas !== 0 || bonusSaude !== 0 || bonusFelicidade !== 0 || despesaMoedas !==0;
+
                 return `
                 <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden group relative" style="aspect-ratio: 5/7;">
                     <!-- Imagem de fundo clicável -->
@@ -1873,11 +2019,8 @@
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
                     
                     <!-- Header com botões de ação -->
-                    <div class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 modo-professor">
                         <div class="flex space-x-1">
-                            <button onclick="venderProduto('${produto.id}')" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-lg transition-colors backdrop-blur-sm" title="Vender Produto">
-                                <i class="fas fa-shopping-cart text-xs"></i>
-                            </button>
                             <button onclick="editarProduto('${produto.id}')" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition-colors backdrop-blur-sm" title="Editar Produto">
                                 <i class="fas fa-edit text-xs"></i>
                             </button>
@@ -1899,8 +2042,8 @@
                         <!-- Título -->
                         <h3 class="text-white font-bold mb-2 line-clamp-1 leading-tight text-shadow-lg">${produto.nome}</h3>
                         
-                        <!-- Efeitos -->
-                         <div class="flex items-center space-x-4 text-base font-medium mb-3">
+                        <!-- Efeitos Imediatos -->
+                         <div class="flex items-center space-x-4 text-sm font-medium mb-2">
                             <span class="flex items-center space-x-1 text-white/90">
                                 <span class="text-red-400">❤️</span>
                                 <span>${efeitoSaude > 0 ? '+' : ''}${efeitoSaude}</span>
@@ -1911,11 +2054,20 @@
                             </span>
                         </div>
                         
-                        <!-- Preço e botão de compra -->
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="text-lg font-bold text-white text-shadow-lg">
-                                💰 ${produto.valor} <span class="text-sm font-normal">moedas</span>
-                            </div>
+                        <!-- Efeitos Mensais -->
+                        ${hasBonus ? `
+                        <div class="flex items-center flex-wrap gap-x-3 text-xs mb-2 text-white/80">
+                            <span class="font-bold">Mensal:</span>
+                            ${bonusMoedas !== 0 ? `<span class="flex items-center space-x-1"><span>💰</span> <span>${bonusMoedas > 0 ? '+' : ''}${bonusMoedas}</span></span>` : ''}
+                            ${despesaMoedas !== 0 ? `<span class="flex items-center space-x-1 text-red-400"><span>💰</span> <span>-${despesaMoedas}</span></span>` : ''}
+                            ${bonusSaude !== 0 ? `<span class="flex items-center space-x-1"><span>❤️</span> <span>${bonusSaude > 0 ? '+' : ''}${bonusSaude}</span></span>` : ''}
+                            ${bonusFelicidade !== 0 ? `<span class="flex items-center space-x-1"><span>😊</span> <span>${bonusFelicidade > 0 ? '+' : ''}${bonusFelicidade}</span></span>` : ''}
+                        </div>
+                        ` : ''}
+                        
+                        <!-- Preço -->
+                        <div class="text-lg font-bold text-white text-shadow-lg mb-2">
+                            💰 ${produto.valor} <span class="text-sm font-normal">moedas</span>
                         </div>
                         
                         <button onclick="venderProduto('${produto.id}')" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-2 px-3 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/20 pointer-events-auto">
@@ -1924,6 +2076,7 @@
                     </div>
                 </div>
             `}).join('');
+            atualizarVisibilidadeProfessor();
         }
         
         function filtrarProdutos() {
@@ -1939,6 +2092,10 @@
             const categoria = document.getElementById('categoriaProduto').value;
             const efeitoSaude = parseInt(document.getElementById('efeitoSaudeProduto').value) || 0;
             const efeitoFelicidade = parseInt(document.getElementById('efeitoFelicidadeProduto').value) || 0;
+            const bonusMensalMoedas = parseInt(document.getElementById('bonusMoedasProduto').value) || 0;
+            const despesaMensal = parseInt(document.getElementById('despesaMoedasProduto').value) || 0;
+            const bonusMensalSaude = parseInt(document.getElementById('bonusSaudeProduto').value) || 0;
+            const bonusMensalFelicidade = parseInt(document.getElementById('bonusFelicidadeProduto').value) || 0;
 
             if (!nome || !descricao || !valor) {
                 showNotification('Por favor, preencha nome, descrição e valor.', 'warning');
@@ -1947,23 +2104,23 @@
 
             const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
             
+            const produtoData = {
+                nome, descricao, imagem, valor: parseInt(valor), categoria, 
+                efeitoSaude, efeitoFelicidade, 
+                bonusMensalMoedas, despesaMensal, bonusMensalSaude, bonusMensalFelicidade
+            };
+
             if (currentEditingProduct) {
                 const index = produtos.findIndex(p => p.id === currentEditingProduct);
                 if (index !== -1) {
-                    produtos[index] = { ...produtos[index], nome, descricao, imagem, valor: parseInt(valor), categoria, efeitoSaude, efeitoFelicidade };
+                    produtos[index] = { ...produtos[index], ...produtoData };
                 }
                 currentEditingProduct = null;
                 showNotification('Produto atualizado com sucesso!', 'success');
             } else {
                 const novoProduto = {
                     id: Date.now().toString(),
-                    nome,
-                    descricao,
-                    imagem,
-                    valor: parseInt(valor),
-                    categoria,
-                    efeitoSaude,
-                    efeitoFelicidade,
+                    ...produtoData,
                     vendas: 0
                 };
                 produtos.push(novoProduto);
@@ -2078,13 +2235,18 @@
             const efeitoFelicidade = produto.efeitoFelicidade || 0;
             
             // Garante que saúde e felicidade existam antes de somar
-            let saudeAtual = typeof alunoParaAtualizar.saude === 'number' ? alunoParaAtualizar.saude : 100;
-            let felicidadeAtual = typeof alunoParaAtualizar.felicidade === 'number' ? alunoParaAtualizar.felicidade : 100;
+            let saudeAtual = typeof alunoParaAtualizar.saude === 'number' ? alunoParaAtualizar.saude : 0;
+            let felicidadeAtual = typeof alunoParaAtualizar.felicidade === 'number' ? alunoParaAtualizar.felicidade : 0;
 
             // Aplica os efeitos e garante que o valor fique entre 0 e 100
             alunoParaAtualizar.saude = Math.max(0, Math.min(100, saudeAtual + efeitoSaude));
             alunoParaAtualizar.felicidade = Math.max(0, Math.min(100, felicidadeAtual + efeitoFelicidade));
             
+            if (!alunoParaAtualizar.inventario) {
+                alunoParaAtualizar.inventario = [];
+            }
+            alunoParaAtualizar.inventario.push(produto.id);
+
             localStorage.setItem('alunos', JSON.stringify(alunos));
 
             // Incrementar vendas do produto
@@ -2133,6 +2295,10 @@
                 document.getElementById('categoriaProduto').value = produto.categoria;
                 document.getElementById('efeitoSaudeProduto').value = produto.efeitoSaude || 0;
                 document.getElementById('efeitoFelicidadeProduto').value = produto.efeitoFelicidade || 0;
+                document.getElementById('bonusMoedasProduto').value = produto.bonusMensalMoedas || 0;
+                document.getElementById('despesaMoedasProduto').value = produto.despesaMensal || 0;
+                document.getElementById('bonusSaudeProduto').value = produto.bonusMensalSaude || 0;
+                document.getElementById('bonusFelicidadeProduto').value = produto.bonusMensalFelicidade || 0;
                 openModal('modalProduto');
             }
         }
@@ -2246,7 +2412,7 @@
                                         <span class="font-semibold text-green-600">💰 ${compra.valor}</span>
                                     </td>
                                     <td class="px-4 py-2">
-                                        <button onclick="estornarCompra('${compra.id}')" class="text-red-500 hover:text-red-700 text-xs" title="Estornar compra">
+                                        <button onclick="estornarCompra('${compra.id}')" class="text-red-500 hover:text-red-700 text-xs modo-professor" title="Estornar compra">
                                             <i class="fas fa-undo"></i> Estornar
                                         </button>
                                     </td>
@@ -2260,6 +2426,7 @@
                     <strong>Valor total:</strong> 💰 ${compras.reduce((total, compra) => total + compra.valor, 0)}
                 </div>
             `;
+            atualizarVisibilidadeProfessor();
         }
 
         function estornarCompra(compraId) {
@@ -2745,8 +2912,8 @@
             alunos.forEach(aluno => {
                 if (aluno.turma === turma && aluno.presente) {
                     aluno.moedas = (aluno.moedas || 0) + moedas;
-                    aluno.saude = Math.min(100, (aluno.saude || 100) + saude);
-                    aluno.felicidade = Math.min(100, (aluno.felicidade || 100) + felicidade);
+                    aluno.saude = Math.min(100, (aluno.saude || 0) + saude);
+                    aluno.felicidade = Math.min(100, (aluno.felicidade || 0) + felicidade);
                     alunosAfetados++;
                 }
             });
@@ -2782,8 +2949,8 @@
             alunos.forEach(aluno => {
                 if (aluno.turma === turma && aluno.presente) {
                     aluno.moedas = Math.max(0, (aluno.moedas || 0) - moedas);
-                    aluno.saude = Math.max(0, (aluno.saude || 100) - saude);
-                    aluno.felicidade = Math.max(0, (aluno.felicidade || 100) - felicidade);
+                    aluno.saude = Math.max(0, (aluno.saude || 0) - saude);
+                    aluno.felicidade = Math.max(0, (aluno.felicidade || 0) - felicidade);
                     alunosAfetados++;
                 }
             });
@@ -2907,10 +3074,56 @@
             };
             input.click();
         }
+
+        // Funções do Modo Professor
+        function toggleProfessorMode() {
+            if (isProfessorMode) {
+                isProfessorMode = false;
+                sessionStorage.setItem('professorMode', 'false');
+                showNotification('Modo Professor desativado.', 'info');
+                atualizarVisibilidadeProfessor();
+            } else {
+                openModal('modalSenhaProfessor');
+            }
+        }
+
+        function verificarSenhaProfessor() {
+            const senha = document.getElementById('senhaProfessor').value;
+            if (senha === 'admin123') {
+                isProfessorMode = true;
+                sessionStorage.setItem('professorMode', 'true');
+                showNotification('Modo Professor ativado!', 'success');
+                closeModal('modalSenhaProfessor');
+                atualizarVisibilidadeProfessor();
+            } else {
+                showNotification('Senha incorreta!', 'error');
+            }
+        }
+
+        function atualizarVisibilidadeProfessor() {
+            const lockIcon = document.getElementById('lockIcon');
+            const elementosProfessor = document.querySelectorAll('.modo-professor');
+            const ferramentaContainer = document.querySelector('.modo-professor-container');
+
+            if (isProfessorMode) {
+                lockIcon.classList.remove('fa-lock');
+                lockIcon.classList.add('fa-lock-open');
+                elementosProfessor.forEach(el => el.style.display = ''); // Re-show elements
+                 if (ferramentaContainer) {
+                    ferramentaContainer.style.opacity = '1';
+                    ferramentaContainer.style.pointerEvents = 'auto';
+                }
+            } else {
+                lockIcon.classList.remove('fa-lock-open');
+                lockIcon.classList.add('fa-lock');
+                elementosProfessor.forEach(el => el.style.display = 'none'); // Hide elements
+                 if (ferramentaContainer) {
+                    ferramentaContainer.style.opacity = '0.5';
+                    ferramentaContainer.style.pointerEvents = 'none';
+                }
+            }
+        }
     </script>
 </body>
 </html>
-
-
-
 
