@@ -1414,8 +1414,8 @@
                 document.getElementById('editNomeAluno').value = aluno.nome;
                 document.getElementById('editAniversarioAluno').value = aluno.aniversario || '';
                 document.getElementById('editMoedasAluno').value = aluno.moedas || 0;
-                document.getElementById('editSaudeAluno').value = aluno.saude || 100;
-                document.getElementById('editFelicidadeAluno').value = aluno.felicidade || 100;
+                document.getElementById('editSaudeAluno').value = aluno.saude || 0;
+                document.getElementById('editFelicidadeAluno').value = aluno.felicidade || 0;
                 openModal('modalEditarAluno');
             }
         }
@@ -2910,6 +2910,7 @@
     </script>
 </body>
 </html>
+
 
 
 
